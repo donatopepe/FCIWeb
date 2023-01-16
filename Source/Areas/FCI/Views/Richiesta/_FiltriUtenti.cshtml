@@ -1,0 +1,192 @@
+﻿@{
+    ViewBag.Title = "_FiltriRunAsIS";
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        //$("#unitOrg").blur(function (event, ui) {
+        //  $('#UocodeSelez').val($("#unitOrg").data("kendoAutoComplete")._data()[0] != null ? $("#unitOrg").data("kendoAutoComplete")._data()[0].UOCode : "");
+        //});
+        //$("#matricola").blur(function (event, ui) {
+        //    $("#MatricolaSelez").val($("#matricola").val() != null ? $("#matricola").val() : "");
+        //    console.log($("#matricola").data("kendoAutoComplete").value);
+        //    console.log($("#matricola").data("kendoAutoComplete").value());
+        //    console.log($("#matricola").val());
+        //});
+        //$("#cognome").blur(function (event, ui) {
+        //  $("#MatricolaSelez").val($("#cognome").data("kendoAutoComplete")._data()[0] != null ? $("#cognome").data("kendoAutoComplete")._data()[0].Matricola : "");
+        //});
+
+    });
+
+    function additionalDataUnitOrg() {
+        return {
+            text:
+                $("#unitOrg").val()
+            //$("#unitOrg").data("kendoAutoComplete")._data()[0] != null ? $("#unitOrg").data("kendoAutoComplete")._data()[0].UOCode : ""
+        };
+    }
+    function additionalDataMatr() {
+        return {
+            text:
+                $("#matricola").val()
+            //$("#matricola").data("kendoAutoComplete")._data()[0] != null ? $("#matricola").data("kendoAutoComplete")._data()[0].Matricola : ""
+        };
+    }
+    function additionalDataCognome() {
+        return {
+            text:
+                $("#cognome").val()
+            //$("#cognome").data("kendoAutoComplete")._data()[0]!=null?$("#cognome").data("kendoAutoComplete")._data()[0].Matricola:""
+        };
+    }
+    function selectUocode(e) {
+        var UOCode = this.dataItem(e.item.index()).UOCode;
+        var IstID = this.dataItem(e.item.index()).IstID;
+        /*      console.log("event :: select (" + dataItem + ")");*/
+
+        $("#cognome").val('');
+        $("#matricola").val('');
+        $("#MatricolaSelez").val('');
+
+        $('#UocodeSelez').val(UOCode != null ? UOCode : "");
+        $('#IstitutoSelez').val(IstID != null ? IstID : "");
+        $("#Filtri_form").submit();
+    }
+    function selectMatricola(e) {
+        var dataItem = this.dataItem(e.item.index()).Matricola;
+        /* console.log("event :: select (" + dataItem + ")");*/
+
+        $("#unitOrg").val('');
+        $("#cognome").val('');
+        $("#UocodeSelez").val('');
+        $("#IstitutoSelez").val('');
+
+        $('#MatricolaSelez').val(dataItem != null ? dataItem : "");
+        $("#Filtri_form").submit();
+    }
+    function selectCognome(e) {
+        var Matricola = this.dataItem(e.item.index()).Matricola;
+        /*  console.log("event :: select (" + dataItem + ")");*/
+
+        $("#unitOrg").val('');
+
+        $("#matricola").val('');
+        $("#UocodeSelez").val('');
+        $("#IstitutoSelez").val('');
+        $("#MatricolaSelez").val('');
+
+        $('#MatricolaSelez').val(Matricola != null ? Matricola : "");
+        $("#Filtri_form").submit();
+    }
+    function changeUo() {
+        /* $("#UocodeSelez").val('');*/
+        var item = $("#unitOrg").val();
+        if (!item || item == null || String(item).trim() == '') {
+            $("#UocodeSelez").val('');
+            $("#IstitutoSelez").val('');
+        }
+    }
+    function changeMatricola() {
+        /*$("#MatricolaSelez").val('');*/
+    }
+    function changeAll() {
+        //$("#UocodeSelez").val('');
+        //$("#MatricolaSelez").val('');
+    }
+    function aggiungiUo() {
+        console.log("Guid Foglio:" + IdFoglio);
+        console.log("UocodeSelez:" + $("#UocodeSelez").val());
+        console.log("IstitutoSelez:" + $("#IstitutoSelez").val());
+        AmministrazioneViewModel.addProfilo($("#IstitutoSelez").val(),$("#UocodeSelez").val(), true);
+    }
+</script>
+
+
+
+@using (Ajax.BeginForm("ElencoUtenti", "Richiesta", null, new AjaxOptions { UpdateTargetId = "elencoUtenti", InsertionMode = InsertionMode.Replace, HttpMethod = "Post" }, new { id = "Filtri_form" }))
+{
+    @Html.Hidden("UocodeSelez")
+    @Html.Hidden("MatricolaSelez")
+    @Html.Hidden("IstitutoSelez")
+    <table>
+        <tr>
+            <td>
+                @Html.Label("Unità Organizzativa:")
+            </td>
+
+            <td>
+                @(Html.Kendo().AutoComplete()
+                .Name("unitOrg")
+                .HtmlAttributes(new { @style = "width: 250px", @class = "DropDownList" })
+                .Template("#=UOCode# - #=DescrizioneUO#")
+                .DataTextField("DescrizioneUO")
+                .Filter(FilterType.Contains)
+                .MinLength(3)
+                .DataSource(
+                  source => source.Read(read => read.Action("_GetUnitaOrganizzativa", "Richiesta").Type(HttpVerbs.Post).Data("additionalDataUnitOrg")).ServerFiltering(true)
+                )
+                .Events(e=>e.Select("selectUocode").Change("changeUo"))
+                .IgnoreCase(true)
+                .Placeholder("--unità organizzativa--")
+                .Suggest(true))
+            </td>
+            <td>
+                <input type="button" value="Aggiungi Unità Organizzativa" onclick="return aggiungiUo()" />
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                @Html.Label("Matricola:")
+            </td>
+
+            <td>
+                @(Html.Kendo().AutoComplete()
+                .Name("matricola")
+                .HtmlAttributes(new { @style = "width: 250px", @class = "DropDownList" })
+                .Template("#=Matricola# - #=LastName# #=FirstName#")
+                .DataTextField("Intestazione")
+                .Filter(FilterType.Contains)
+                .MinLength(3)
+                .DataSource(
+                  source => source.Read(read => read.Action("_GetMatricoleOrg", "Richiesta").Type(HttpVerbs.Post).Data("additionalDataMatr")).ServerFiltering(true)
+                )
+                .Events(e=>e.Select("selectMatricola").Change("changeAll"))
+                .IgnoreCase(true)
+                .Placeholder("--matricola--")
+                .Suggest(true)
+                )
+            </td>
+            <td>
+                @Html.Label("Cognome:")
+            </td>
+
+            <td>
+                @(Html.Kendo().AutoComplete()
+                .Name("cognome")
+                .HtmlAttributes(new { @style = "width: 250px", @class = "DropDownList" })
+                .Template("#=Matricola# - #=LastName# #=FirstName#")
+                .DataTextField("Intestazione")
+                .MinLength(3)
+                .Filter(FilterType.Contains)
+                .DataSource(
+                  source => source.Read(read => read.Action("_GetUtenze", "Richiesta").Type(HttpVerbs.Post).Data("additionalDataCognome")).ServerFiltering(true)
+                )
+                .Events(e=>e.Select("selectCognome").Change("changeAll"))
+                .IgnoreCase(true)
+                .Placeholder("--cognome--")
+                .Suggest(true)
+                )
+            </td>
+
+
+            @*<td>
+                    <input id="btnSubmit" type="submit" class="bottone_submit" value="Cerca" />
+                </td>*@
+
+
+        </tr>
+
+    </table>
+}

@@ -1,0 +1,113 @@
+﻿@{
+    ViewBag.Title = "Nuova Lista";
+    Layout = "~/Views/Shared/_Layout_10.cshtml";
+}
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+</head>
+
+
+<!---------------------------------- DataTable Jquery ------------------------------->
+<!--<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.css" />
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.11.3/datatables.min.js"></script>-->
+<!---------------------------------- DataTable Jquery ------------------------------->
+<h2>@ViewBag.Title</h2>
+
+
+<div>
+    <fieldset>
+        @using (Html.BeginForm("ImportaFile", "Richiesta", new { }, FormMethod.Post, new { enctype = "multipart/form-data", id = "Form" }))
+        {
+            <table>
+                <tr>
+                    <td>
+                        <div>
+                            <input onchange="validateFile(this)" class="form-control text-box single-line" id="FileForm" name="FileForm" type="file" value="" />
+                            @Html.ValidationMessage("FileForm", "", new { @class = "text-danger" })
+                        </div>
+                    </td>
+                    <td>
+                        <div class="col-md-2">
+                            <b>Nome Lista</b>
+                            <input class="form-control text-box single-line" id="Nome" name="Nome" type="text" value="" />
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-group">
+                            <div class="col-md-offset-2 col-md-10">
+                                <button class="bottone_submit" name="operationType" value="AddFile" type="submit" id="btnAddAllegato">Importa File</button>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        }
+    </fieldset>
+    <script>
+
+        function validateFile(input) {
+
+            var fileSize = input.files[0].size / 1024 / 1024; // in MiB
+            if (fileSize > 5) {
+                alert("File size eccede 5 MiB");
+                $("#FileForm").replaceWith($("#FileForm").val("").clone(true));
+            } else {
+
+            }
+            console.log("Validate size:" + fileSize);
+            var fileName = input.files[0].name;
+            console.log("Validate filename:" + fileName);
+            regex = new RegExp("(.*?)\.(xls|xlsx)$");
+
+            if (!(regex.test(fileName))) {
+                $("#FileForm").replaceWith($("#FileForm").val("").clone(true));
+                alert("Formato file non consentito");
+            }
+        }
+    </script>
+</div>
+
+<div id='GestioneRichieste' style="max-width: 950px; display: block; overflow: hidden;">
+    <div id="dettaglio">
+
+    </div>
+</div>
+
+<script type="text/javascript">
+    var ApriRichiestaId = '@ViewData["ApriRichiestaId"]';
+        function Gestione(id) {
+        var url = '@Url.Action("ApriRichiesta", "Richiesta")';
+                                dato = {
+                                    Guid: id
+        };
+        $("#loading").css("display", "block");
+                                console.log(dato);
+                                $.ajax({
+                                    url: url,
+                                    data: dato,
+                                    type: "GET",
+                                    error: function (xhr) {
+                                        $("#loading").css("display", "none");
+                                        alert('Error: ' + xhr.statusText);
+                                    },
+                                    success: function (result) {
+                                        $("#loading").css("display", "none");
+                                        console.log("Popolo div dettaglio");
+
+                                        $('#dettaglio').html(result);
+
+                                    }
+                                });
+    }
+
+
+    $(document).ready(function () {
+        Gestione(ApriRichiestaId);
+        $("#containerTop").css("height", "auto");
+    });
+</script>
+

@@ -1,0 +1,102 @@
+﻿@model IEnumerable<FCIWeb.Areas.FCI.Models.LogStati>
+<style>
+    table.logTable {
+        border: 2px solid #A40808;
+        background-color: #EEE7DB;
+        width: 100%;
+        text-align: center;
+        border-collapse: collapse;
+    }
+    table.logTable td, table.logTable th {
+        border: 1px solid #AAAAAA;
+        padding: 3px 2px;
+    }
+    table.logTable tbody td {
+        font-size: 13px;
+    }
+    table.logTable tr:nth-child(even) {
+        background: #F5C8BF;
+    }
+    table.logTable thead {
+        background: #A40808;
+    }
+    table.logTable thead th {
+        font-size: 19px;
+        font-weight: bold;
+        color: #FFFFFF;
+        text-align: center;
+        border-left: 2px solid #A40808;
+    }
+    table.logTable thead th:first-child {
+        border-left: none;
+    }
+
+    table.logTable tfoot {
+        font-size: 13px;
+        font-weight: bold;
+        color: #FFFFFF;
+        background: #A40808;
+    }
+    table.logTable tfoot td {
+        font-size: 13px;
+    }
+    table.logTable tfoot .links {
+        text-align: right;
+    }
+    table.logTable tfoot .links a{
+        display: inline-block;
+        background: #FFFFFF;
+        color: #A40808;
+        padding: 2px 8px;
+        border-radius: 5px;
+    }
+</style>
+<table class="TabellaRCD2">
+    <thead class="k-grid-header" style="font-size:9pt">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.stato)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Motivazione)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.istIDUltimaModifica)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UOCodeUltimaModifica)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MatricolaUltimaModifica)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UltimaModifica)
+            </th>
+
+        </tr>
+
+        @foreach (var item in Model)
+        {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.stato.Descrizione)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Motivazione)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.istIDUltimaModifica)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.UOCodeUltimaModifica)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.MatricolaUltimaModifica)
+        </td>
+
+        <td>
+            @Html.DisplayFor(modelItem => item.UltimaModifica)
+        </td>
+    </tr>
+        }
+</table>

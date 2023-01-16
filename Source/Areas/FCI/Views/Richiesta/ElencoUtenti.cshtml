@@ -1,0 +1,52 @@
+﻿@using System.Configuration
+@using System.Web.Hosting
+@using AreaCommonWeb.DAL
+@using AreaCommonWeb.ModelView.Security
+@{
+    ViewBag.Title = "Griglia Utenti";
+}
+@model Dictionary<string,string>
+
+<script type="text/javascript">
+  function aggiungiUtente(istituto, matricola) {
+      console.log("Guid Foglio:" + IdFoglio);
+      console.log("istituto:" + istituto);
+      console.log("matricola:" + matricola);
+
+      AmministrazioneViewModel.addProfilo(istituto, matricola, false);
+  }
+
+  function datagrid(parameters) {
+    return  {
+      UocodeSelez : '@Model.First().Key',
+      MatricolaSelez : '@Model.First().Value'
+
+    };
+  }
+</script>
+@(Html.Kendo().Grid<vw_Prof_Resource>()
+    .Name("GridUtenti")
+    .Columns(columns =>
+               {
+                 columns.Bound(o => o.Matricola).ClientTemplate("<input type=\"button\" class=\"gridGotoTask\" onclick=\"return aggiungiUtente(#= CodIstituto #,'#= Matricola #')\"/>").Title("").HtmlAttributes(new { @nowrap = "nowrap" }).Filterable(false);
+                 columns.Bound(o => o.CodIstituto);
+                 columns.Bound(o => o.Matricola);
+                 columns.Bound(o => o.LastName).ClientTemplate("#=data.LastName# #=data.FirstName#").Title("Nominativo");
+                 columns.Bound(o => o.MansioneNormalizzata).Title("Mansione");
+                 columns.Bound(o => o.DescrizioneUO).Title("Unità org.");
+
+
+
+
+               })
+    .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    
+                                    .Read(read => read.Action("_GridElencoUtenti", "Richiesta").Data("datagrid"))
+        )
+    .Resizable(resize => resize.Columns(true))
+    .Sortable(sorting => sorting.Enabled(true))
+    .Scrollable(scrolling => scrolling.Enabled(false))
+    .Pageable(paging => paging.Enabled(true).Messages(m => m
+                                                             .Display("{0} - {1} di {2} elementi")
+                                                             .Empty("Nessun elemento trovato"))))

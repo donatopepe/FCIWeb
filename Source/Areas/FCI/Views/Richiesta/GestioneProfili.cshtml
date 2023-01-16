@@ -1,0 +1,51 @@
+﻿@{
+    ViewBag.Title = "Gestione Profili";
+    Layout = "~/Views/Shared/_Layout_10.cshtml";
+
+}
+<script>
+    var IdFoglio = '@ViewData["IdFoglio"]';
+    var guid = IdFoglio;
+    console.log("Guid:" + guid);
+</script>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+
+    <script src="@Url.Content("~/Scripts/knockout-3.5.1.js")"></script>
+
+    <meta name="viewport" content="width=device-width" />
+</head>
+
+
+
+<body>
+    <h2>Gestione Utenti</h2>
+    <div id='filtriUtente'>
+        @Html.Partial("_FiltriUtenti")
+    </div>
+
+
+    <div id='elencoUtenti'>
+
+    </div>
+
+    <div id='_profili'>
+        @Html.Partial("ApriProfili")
+    </div>
+</body>
+
+</html>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#containerTop").css("height", "auto");
+
+
+    });
+</script>

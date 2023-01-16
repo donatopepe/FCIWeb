@@ -1,0 +1,623 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_10.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=11" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+    <!--<script src="https://polyfill.io/v3/polyfill.min.js?features=es5,es6,es7&flags=gated"></script>-->
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.8.3/polyfill.min.js" type="text/javascript"></script>*@
+    <!--<script src="@Url.Content("~/Scripts/babel.min.js")" ></script>-->
+
+
+    <script src="@Url.Content("~/Scripts/knockout-3.5.1.js")"></script>
+    <script src="@Url.Content("~/Scripts/jexcel_custom/jexcel.js")"></script>
+    <script src="@Url.Content("~/Scripts/jexcel_custom/jsuites.js")"></script>
+    <link rel="stylesheet" href="@Url.Content("~/Scripts/jexcel_custom/jsuites.css")" type="text/css" />
+    <link rel="stylesheet" href="@Url.Content("~/Scripts/jexcel_custom/jexcel.css")" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Material+Icons" />
+
+    <meta name="viewport" content="width=device-width" />
+    <title>Home</title>
+</head>
+<body>
+    <div>
+        @using (Html.BeginForm("Home", "Default", new { }, FormMethod.Post, new { enctype = "multipart/form-data", id = "Form" }))
+        {
+            <div>
+                <div>
+                    @*<input type="file" name="FileForm" id="FileForm" />*@
+                    @*@Html.Editor("FileForm", new { htmlAttributes = new { @type = "file", @class = "form-control" } })*@
+                    <input onchange="validateFile(this)" class="form-control text-box single-line" id="FileForm" name="FileForm" type="file" value="" />
+                    @Html.ValidationMessage("FileForm", "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button class="bottone_submit" name="operationType" value="AddFile" type="submit" id="btnAddAllegato">Salva File</button>
+                </div>
+            </div>
+        }
+    </div>
+
+
+    <div id="spreadsheet"></div>
+    <div id="log"></div>
+    <input type="button" value="Add new tab" onclick="add()" style="width:150px;">
+    @*<input type="button" value="Download selected tab" onclick="download()" style="width:150px;">*@
+
+    <script>
+        //var undo = false; //implementazione logica di cella in sola lettura, ma non serve
+        //var prec;
+        var changed = function (instance, cell, x, y, value) {
+            var cellName = jexcel.getColumnNameFromId([x, y]);
+            console.log('New change on cell ' + cellName + ' to: ' + value + '');
+
+
+            //implementazione logica di cella in sola lettura, ma non serve
+            //if (cellName == 'D4' && !undo) {
+            //    undo = true;
+            //    var worksheet = document.getElementById('spreadsheet').children[0].querySelector('.selected').getAttribute('data-spreadsheet');
+            //    document.getElementById('spreadsheet').jexcel[worksheet].undo();
+            //    document.getElementById('spreadsheet').jexcel[worksheet].setValue(cellName, prec, true);
+            //} else {
+            //    undo = false;
+            //}
+
+        }
+
+        var beforeChange = function (instance, cell, x, y, value) {
+            var cellName = jexcel.getColumnNameFromId([x, y]);
+            console.log('The cell ' + cellName + ' will be changed ' + value);
+            //implementazione logica di cella in sola lettura, ma non serve
+            //if (cellName == 'D4') {
+            //    var worksheet = document.getElementById('spreadsheet').children[0].querySelector('.selected').getAttribute('data-spreadsheet');
+            //    prec = document.getElementById('spreadsheet').jexcel[worksheet].getValue(cellName);
+            //}
+        }
+
+        var insertedRow = function (instance) {
+            console.log('Row added');
+        }
+
+        var insertedColumn = function (instance) {
+            console.log('Column added');
+        }
+
+        var deletedRow = function (instance) {
+            console.log('Row deleted');
+        }
+
+        var deletedColumn = function (instance) {
+            console.log('Column deleted');
+        }
+
+        var sort = function (instance, cellNum, order) {
+            var order = (order) ? 'desc' : 'asc';
+            console.log('The column  ' + cellNum + ' sorted by ' + order + '');
+        }
+
+        var resizeColumn = function (instance, cell, width) {
+            console.log('The column  ' + cell + ' resized to width ' + width + ' px');
+        }
+
+        var resizeRow = function (instance, cell, height) {
+            console.log('The row  ' + cell + ' resized to height ' + height + ' px');
+        }
+
+        var selectionActive = function (instance, x1, y1, x2, y2, origin) {
+            var cellName1 = jexcel.getColumnNameFromId([x1, y1]);
+            var cellName2 = jexcel.getColumnNameFromId([x2, y2]);
+            console.log('The selection from ' + cellName1 + ' to ' + cellName2 + '');
+        }
+
+        var loaded = function (instance) {
+            console.log('New data is loaded');
+        }
+
+        var moveRow = function (instance, from, to) {
+            console.log('The row ' + from + ' was move to the position of ' + to + '');
+        }
+
+        var moveColumn = function (instance, from, to) {
+            console.log('The col ' + from + ' was move to the position of ' + to + '');
+        }
+
+        var blur = function (instance) {
+            console.log('The table ' + $(instance).prop('id') + ' is blur');
+        }
+
+        var focus = function (instance) {
+            console.log('The table ' + $(instance).prop('id') + ' is focus');
+        }
+
+        var paste = function (data) {
+            console.log('Paste on the table ' + $(instance).prop('id') + '');
+        }
+
+        var toolbar = [
+            {
+                type: 'i',
+                content: 'undo',
+                onclick: function () {
+                    var worksheet = document.getElementById('spreadsheet').children[0].querySelector('.selected').getAttribute('data-spreadsheet');
+                    document.getElementById('spreadsheet').jexcel[worksheet].undo();
+                }
+            },
+            {
+                type: 'i',
+                content: 'redo',
+                onclick: function () {
+                    var worksheet = document.getElementById('spreadsheet').children[0].querySelector('.selected').getAttribute('data-spreadsheet');
+                    document.getElementById('spreadsheet').jexcel[worksheet].redo();
+                }
+            },
+            {
+                type: 'i',
+                content: 'save',
+                onclick: function () {
+                    /*table.download();*/
+                    //console.log(JSON.stringify(table.getStyle()) + "</br>");
+                    //console.log(JSON.stringify(table.getJson()) + "</br>");
+                    download();
+
+                }
+            },
+            {
+                type: 'select',
+                k: 'font-family',
+                v: ['Arial', 'Verdana']
+            },
+            {
+                type: 'select',
+                k: 'font-size',
+                v: ['9px', '10px', '11px', '12px', '13px', '14px', '15px', '16px', '17px', '18px', '19px', '20px']
+            },
+            {
+                type: 'i',
+                content: 'format_align_left',
+                k: 'text-align',
+                v: 'left'
+            },
+            {
+                type: 'i',
+                content: 'format_align_center',
+                k: 'text-align',
+                v: 'center'
+            },
+            {
+                type: 'i',
+                content: 'format_align_right',
+                k: 'text-align',
+                v: 'right'
+            },
+            {
+                type: 'i',
+                content: 'format_bold',
+                k: 'font-weight',
+                v: 'bold'
+            },
+            {
+                type: 'color',
+                content: 'format_color_text',
+                k: 'color'
+            },
+            {
+                type: 'color',
+                content: 'format_color_fill',
+                k: 'background-color'
+            },
+        ];
+
+        var contextMenu = function (obj, x, y, e) {
+            var items = [];
+
+            if (y == null) {
+                // Insert a new column
+                if (obj.options.allowInsertColumn == true) {
+                    items.push({
+                        title: obj.options.text.insertANewColumnBefore,
+                        onclick: function () {
+                            obj.insertColumn(1, parseInt(x), 1);
+                        }
+                    });
+                }
+
+                if (obj.options.allowInsertColumn == true) {
+                    items.push({
+                        title: obj.options.text.insertANewColumnAfter,
+                        onclick: function () {
+                            obj.insertColumn(1, parseInt(x), 0);
+                        }
+                    });
+                }
+
+                // Delete a column
+                if (obj.options.allowDeleteColumn == true) {
+                    items.push({
+                        title: obj.options.text.deleteSelectedColumns,
+                        onclick: function () {
+                            obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                        }
+                    });
+                }
+
+                // Rename column
+                if (obj.options.allowRenameColumn == true) {
+                    items.push({
+                        title: obj.options.text.renameThisColumn,
+                        onclick: function () {
+                            obj.setHeader(x);
+                        }
+                    });
+                }
+
+                // Sorting
+                if (obj.options.columnSorting == true) {
+                    // Line
+                    /*                    items.push({ type: 'line' });*/
+
+                    items.push({
+                        title: obj.options.text.orderAscending,
+                        onclick: function () {
+                            obj.orderBy(x, 0);
+                        }
+                    });
+                    items.push({
+                        title: obj.options.text.orderDescending,
+                        onclick: function () {
+                            obj.orderBy(x, 1);
+                        }
+                    });
+                }
+            } else {
+                // Insert new row
+                if (obj.options.allowInsertRow == true) {
+                    items.push({
+                        title: obj.options.text.insertANewRowBefore,
+                        onclick: function () {
+                            obj.insertRow(1, parseInt(y), 1);
+                        }
+                    });
+
+                    items.push({
+                        title: obj.options.text.insertANewRowAfter,
+                        onclick: function () {
+                            obj.insertRow(1, parseInt(y));
+                        }
+                    });
+                }
+
+                if (obj.options.allowDeleteRow == true) {
+                    items.push({
+                        title: obj.options.text.deleteSelectedRows,
+                        onclick: function () {
+                            obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));
+                        }
+                    });
+                }
+
+                if (x) {
+                    if (obj.options.allowComments == true) {
+                        items.push({ type: 'line' });
+
+                        var title = obj.records[y][x].getAttribute('title') || '';
+
+                        items.push({
+                            title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                            onclick: function () {
+                                obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                            }
+                        });
+
+                        if (title) {
+                            items.push({
+                                title: obj.options.text.clearComments,
+                                onclick: function () {
+                                    obj.setComments([x, y], '');
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            //// Line
+            //items.push({ type: 'line' });
+
+            //// Save
+            //if (obj.options.allowExport) {
+            //    items.push({
+            //        title: obj.options.text.saveAs,
+            //        shortcut: 'Ctrl + S',
+            //        onclick: function () {
+            //            obj.download();
+            //        }
+            //    });
+            //}
+
+            //// About
+            //if (obj.options.about) {
+            //    items.push({
+            //        title: obj.options.text.about,
+            //        onclick: function () {
+            //            alert(obj.options.about);
+            //        }
+            //    });
+            //}
+
+            return items;
+        };
+        var columns = [
+            {
+                title: 'Country',
+                type: 'autocomplete',
+                source: ['Brazil', 'Canada', 'China', 'Japan', 'United States', 'United Kingdom'],
+                width: '300px',
+            },
+            {
+                title: 'Food',
+                type: 'dropdown',
+                source: ['Apples', 'Bananas', 'Carrots', 'Oranges', 'Cheese'],
+                width: '150px',
+            },
+            {
+                title: 'Stock',
+                type: 'checkbox',
+                width: '100px',
+            },
+        ];
+        data = [
+            ['Canada', 'Cheese', 1],
+            ['Japan', 'Apples', 0],
+            ['United States', 'Carrots', 1],
+            ['China', 'Oranges', 0],
+        ];
+        /**
+         * Add new worksheet
+         */
+        var add = function () {
+            var sheets = [];
+
+            sheets.push({
+                sheetName: prompt('Create a new tab', 'New tab ' + document.getElementById('spreadsheet').jexcel.length),
+                minDimensions: [10, 10],
+                columnSorting: true,
+                allowComments: true,
+                allowInsertColumn: false,
+                allowDeleteColumn: false,
+                allowRenameColumn: false,
+                contextMenu: contextMenu,
+                toolbar: toolbar,
+                rowResize: true,
+                columnDrag: true,
+                onchange: changed,
+                onbeforechange: beforeChange,
+                oninsertrow: insertedRow,
+                oninsertcolumn: insertedColumn,
+                ondeleterow: deletedRow,
+                ondeletecolumn: deletedColumn,
+                onselection: selectionActive,
+                onsort: sort,
+                onresizerow: resizeRow,
+                onresizecolumn: resizeColumn,
+                onmoverow: moveRow,
+                onmovecolumn: moveColumn,
+                onload: loaded,
+                onblur: blur,
+                onfocus: focus,
+                onpaste: paste,
+            });
+
+            jspreadsheet.tabs(document.getElementById('spreadsheet'), sheets);
+        }
+
+        /**
+         * Download current worksheet
+         */
+        var download = function () {
+            // Get selected tab
+            var worksheet = document.getElementById('spreadsheet').children[0].querySelector('.selected').getAttribute('data-spreadsheet');
+            // Download
+            /*document.getElementById('spreadsheet').jexcel[worksheet].download();*/
+            console.log(JSON.stringify(document.getElementById('spreadsheet').jexcel[worksheet].getStyle()));
+            console.log(JSON.stringify(document.getElementById('spreadsheet').jexcel[worksheet].getJson()));
+        }
+
+        /**
+         * Create worksheet container with two jexcel instances
+         */
+        var data3 = [
+            ['Mazda', 2001, 2000, '2006-01-01'],
+            ['Pegeout', 2010, 5000, '2005-01-01'],
+            ['Honda Fit', 2009, 3000, '2004-01-01'],
+            ['Honda CRV', 2010, 6000, '2003-01-01'],
+        ];
+        var data2 = [
+            ['Canada', 'Cheese', 1],
+            ['Japan', 'Apples', 0],
+            ['United States', 'Carrots', 1],
+            ['China', 'Oranges', 0],
+        ];
+        var sheets = [
+            {
+                sheetName: 'Countries',
+                minDimensions: [10, 10],
+                data: data,
+                columnSorting: true,
+                columns: columns,
+                allowComments: true,
+                allowInsertColumn: false,
+                allowDeleteColumn: false,
+                allowRenameColumn: false,
+                contextMenu: contextMenu,
+                toolbar: toolbar,
+                rowResize: true,
+                columnDrag: true,
+                onchange: changed,
+                onbeforechange: beforeChange,
+                oninsertrow: insertedRow,
+                oninsertcolumn: insertedColumn,
+                ondeleterow: deletedRow,
+                ondeletecolumn: deletedColumn,
+                onselection: selectionActive,
+                onsort: sort,
+                onresizerow: resizeRow,
+                onresizecolumn: resizeColumn,
+                onmoverow: moveRow,
+                onmovecolumn: moveColumn,
+                onload: loaded,
+                onblur: blur,
+                onfocus: focus,
+                onpaste: paste,
+            },
+        ];
+
+        jspreadsheet.tabs(document.getElementById('spreadsheet'), sheets);
+    </script>
+
+
+    <div id="spreadsheet3"></div>
+
+    <script>
+        jspreadsheet(document.getElementById('spreadsheet3'), {
+            data: [
+                {
+                    name: 'Paulo',
+                    id: '3',
+                    age: '40',
+                    gender: 'Male'
+                },
+                {
+                    name: 'Cosme Sergio',
+                    id: '4',
+                    age: '48',
+                    gender: 'Male'
+                },
+                {
+                    name: 'Jorgina Santos',
+                    id: '5',
+                    age: '32',
+                    gender: 'Female'
+                },
+            ],
+            columns: [
+                {
+                    type: 'text',
+                    width: '40',
+                    name: 'id',
+                    title: 'Id',
+                },
+                {
+                    type: 'text',
+                    width: '200',
+                    name: 'name',
+                    title: 'Name',
+                },
+                {
+                    type: 'text',
+                    width: '100',
+                    name: 'age',
+                    title: 'Age',
+                },
+                {
+                    type: 'hidden',
+                    name: 'gender'
+                },
+            ]
+        });
+    </script>
+
+
+
+    <div id="spreadsheet4"></div>
+
+    <script>
+        var data = [
+            ['Crayons Crayola only (No Rose Art)', 2, 5.01, '=B1*C1'],
+            ['Colored Pencils Crayola only', 2, 4.41, '=B2*C2'],
+            ['Expo Dry-erase Markers Wide', 4, 3.00, '=B3*C3'],
+            ['Index Cards Unlined', 3, 6.00, '=B4*C4'],
+            ['Tissues', 10, '1.90', '=B5*C5'],
+            ['Ziploc Sandwich-size Bags', 5, 1.00, '=B6*C6'],
+            ['Thin Markers Crayola only', 2, 3.00, '=B7*C7'],
+            ['Highlighter', 4, 1.20, '=B8*C8'],
+            ['Total', '=SUM(B1:B8)', '=ROUND(SUM(C1:C8), 2)', '=SUM(D1:D8)'],
+        ];
+
+        jspreadsheet(document.getElementById('spreadsheet4'), {
+            data: data,
+            columns: [
+                { type: 'text', title: 'Product', width: '300' },
+                { type: 'text', title: 'Qtd', width: '80' },
+                { type: 'text', title: 'Price', width: '100', mask: '#.##,00', decimal: ',' },
+                { type: 'text', title: 'Total', width: '100' },
+            ],
+            updateTable: function (instance, cell, col, row, val, label, cellName) {
+                if (cell.innerHTML == 'Total') {
+                    cell.parentNode.style.backgroundColor = '#fffaa3';
+                }
+
+                if (col == 3) {
+                    if (parseFloat(label) > 10) {
+                        cell.style.color = 'red';
+                    } else {
+                        cell.style.color = 'green';
+                    }
+                }
+            },
+            columnSorting: false,
+        });
+    </script>
+
+    <p>First name: <input data-bind="value: firstName" /></p>
+    <p>Last name: <input data-bind="value: lastName" /></p>
+    <h2>Hello, <span data-bind="text: fullName"> </span>!</h2>
+
+    <script>
+        var ViewModel = function (first, last) {
+            this.firstName = ko.observable(first);
+            this.lastName = ko.observable(last);
+
+            this.fullName = ko.pureComputed(function () {
+                // Knockout tracks dependencies automatically. It knows that fullName depends on firstName and lastName, because these get called when evaluating fullName.
+                return this.firstName() + " " + this.lastName();
+            }, this);
+        };
+
+        ko.applyBindings(new ViewModel("Planet", "Earth"));
+    </script>
+
+</body>
+</html>
+
+
+
+
+<script>
+
+    function validateFile(input) {
+
+        var fileSize = input.files[0].size / 1024 / 1024; // in MiB
+        if (fileSize > 5) {
+            alert('File size eccede 5 MiB');
+            $("#FileForm").replaceWith($("#FileForm").val('').clone(true));
+        } else {
+
+        }
+        console.log('Validate size:' + fileSize);
+        var fileName = input.files[0].name;
+        console.log('Validate filename:' + fileName);
+        regex = new RegExp("(.*?)\.(xls|xlsx)$");
+
+        if (!(regex.test(fileName))) {
+            $("#FileForm").replaceWith($("#FileForm").val('').clone(true));
+            alert('Formato file non consentito');
+        }
+    }
+</script>

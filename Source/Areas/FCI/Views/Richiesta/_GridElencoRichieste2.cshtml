@@ -1,0 +1,294 @@
+﻿@model IEnumerable<FCIWeb.Areas.FCI.Models.Fogli>
+
+@{
+    ViewBag.Title = "Index";
+    //Layout = "~/Views/Shared/_Layout_10.cshtml";
+}
+
+<style>
+    table.TabellaRCD {
+        width: 100%;
+        text-align: left;
+        border-collapse: collapse;
+    }
+
+        table.TabellaRCD td, table.TabellaRCD th {
+            border: 1px solid #AAAAAA;
+        }
+
+        table.TabellaRCD tr:nth-child(even) {
+            background: #EEECEC;
+        }
+
+        table.TabellaRCD thead {
+            background: #EEECEC;
+        }
+
+            table.TabellaRCD thead th {
+                font-weight: normal;
+                text-align: left;
+            }
+
+        table.TabellaRCD tfoot {
+            font-weight: normal;
+            background: #EEECEC;
+        }
+
+            table.TabellaRCD tfoot .links {
+                text-align: right;
+            }
+
+                table.TabellaRCD tfoot .links a {
+                    display: inline-block;
+                    background: #FFFDFD;
+                    color: #000000;
+                    padding: 2px 8px;
+                    border-radius: 5px;
+                }
+
+
+
+    table.blueTable {
+        border: 1px solid #1C6EA4;
+        background-color: #EEEEEE;
+        width: 100%;
+        text-align: left;
+        border-collapse: collapse;
+    }
+
+        table.blueTable td, table.blueTable th {
+            border: 1px solid #AAAAAA;
+            padding: 3px 2px;
+        }
+
+        table.blueTable tbody td {
+            font-size: 13px;
+        }
+
+        table.blueTable tr:nth-child(even) {
+            background: #D0E4F5;
+        }
+
+        table.blueTable thead {
+            background: #1C6EA4;
+            background: -moz-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            background: -webkit-linear-gradient(top, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            background: linear-gradient(to bottom, #5592bb 0%, #327cad 66%, #1C6EA4 100%);
+            border-bottom: 2px solid #444444;
+        }
+
+            table.blueTable thead th {
+                font-size: 10px;
+                font-weight: bold;
+                color: #FFFFFF;
+                border-left: 2px solid #D0E4F5;
+            }
+
+                table.blueTable thead th:first-child {
+                    border-left: none;
+                }
+
+        table.blueTable tfoot {
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFFFFF;
+            background: #D0E4F5;
+            background: -moz-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+            background: -webkit-linear-gradient(top, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+            background: linear-gradient(to bottom, #dcebf7 0%, #d4e6f6 66%, #D0E4F5 100%);
+            border-top: 2px solid #444444;
+        }
+
+            table.blueTable tfoot td {
+                font-size: 14px;
+            }
+
+            table.blueTable tfoot .links {
+                text-align: right;
+            }
+
+                table.blueTable tfoot .links a {
+                    display: inline-block;
+                    background: #1C6EA4;
+                    color: #FFFFFF;
+                    padding: 2px 8px;
+                    border-radius: 5px;
+                }
+</style>
+
+<h2>Elenco Liste</h2>
+
+
+
+@*<div class="tab-content">
+    <div class="tab-pane container active p-0" id="home" style="margin-top:15px;">
+    <table id="indexTable" class="table table-bordered blueTable" >*@
+
+<div class="">
+    <div class="" id="home">
+        <table id="indexTable" class="TabellaRCD2" style="">
+            <thead class="k-grid-header" style="font-size:9pt">
+                <tr>                    
+                    <th>
+                        @Html.DisplayNameFor(model => model.NomeLista)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.NomeFile)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UOCode)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Matricola)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.MatricolaUltimaModifica)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UltimaModifica)
+                    </th>
+
+                    <th class=""></th>
+                    
+                </tr>
+            </thead>
+            <tbody style="font-size:9pt"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="finestralogstati" style="display: none">
+</div>
+
+<script type="text/javascript">
+
+    function CovertiDataAspNet(item) {
+        if ((item != null) && (String(item).substring(0, 5) == "/Date")) {
+
+            @* $('#DataPagamento').val(new Date(Date.parse('@Model.DataPagamento')).format("yyyy-MM-dd"));
+            $('#DataSottoscrizione').val(new Date(Date.parse('@Model.DataSottoscrizione')).format("yyyy-MM-dd"));*@
+
+            item = String(item).replace("/Date(", "").replace(")/", "");
+            var dateObj = new Date(+item);
+            var month = dateObj.getMonth() + 1; //months from 1-12
+            var day = dateObj.getDate();
+            var year = dateObj.getFullYear();
+            item = ("000" + day).slice(-2) + "/" + ("000" + month).slice(-2) + "/" + year;
+            //console.log("data trovata:" + item);
+
+        }
+        return item;
+    }
+       
+    function Gestione(id) {
+        var url = '@Url.Action("AssociaUOCODE", "Richiesta")';
+                                dato = {
+                                    Guid: id
+        };
+        $("#loading").css("display", "block");
+                                console.log(dato);
+                                $.ajax({
+                                    url: url,
+                                    data: dato,
+                                    type: "GET",
+                                    error: function (xhr) {
+                                        $("#loading").css("display", "none");
+                                        alert('Error: ' + xhr.statusText);
+                                    },
+                                    success: function (result) {
+                                        $("#loading").css("display", "none");
+                                        console.log("Popolo div dettaglio");
+
+                                        $('#dettaglio').html(result);
+
+                                    }
+                                });
+    }    
+
+    function LeggiRichieste() {
+
+        var data = @Html.Raw(Json.Encode(Model));
+
+        $("#indexTable").DataTable({
+            "language": {
+                url: '@Url.Content("~/Scripts/DataTables/it_it.json")'
+            },
+            destroy: true,
+            data: data,
+            deferRender: true,
+            scrollX: false,
+            scrollY: 400,
+            scrollCollapse: true,
+            scroller: true,
+            searching: true,
+            paging: true,
+            info: false,
+            columnDefs: [
+                {
+
+                }
+            ],
+            "columns": [
+                
+                { "data": "NomeLista" },
+                { "data": "NomeFile" },
+                { "data": "UOCode" },
+                { "data": "Matricola" },
+                { "data": "MatricolaUltimaModifica" },
+                {
+                    "data": "UltimaModifica",
+                    "render": function (item) {
+                        return CovertiDataAspNet(item);
+                    } },
+
+                
+                {
+                    'data': null,
+                    title: '',
+                    wrap: true,
+                    "orderable": false,
+                    "render": function (item) {
+                        console.log("item.Guid ") + item.Guid
+                        console.log("item.istID " + item.istID);
+                        console.log("item.UOCode " + item.UOCode);
+                        console.log("item.Guid " + item.Guid);
+                        ///da valutare bene
+                        //if ((item.istID!="@ViewData["istituto"]")||(item.UOCode !=  "@ViewData["uocode"]")) return '';
+                        //if (item.Stato.Chiuso) return '';
+                        var Id = "'" + item.Guid + "'";
+                        var urlimage = "'@Url.Content("~/Content/img/edit_icon.png")'";
+                        var html = '<img onclick="Gestione(';
+                        html += Id + ')" src=' + urlimage + ' style="cursor: pointer;" />';
+                        
+                        return html;
+                    }
+                },
+
+
+            ],
+
+
+
+        });
+    };
+
+    $(document).ready(function () {
+
+
+
+        LeggiRichieste();
+
+                @*if ((ApriRichiestaId != "") && (ApriRichiestaId !="@Guid.Empty")) Dettagli(ApriRichiestaId);*@
+
+    });
+</script>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#containerTop").css("height", "auto");
+
+
+    });
+</script>

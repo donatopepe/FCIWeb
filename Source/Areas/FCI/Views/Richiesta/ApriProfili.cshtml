@@ -1,0 +1,187 @@
+﻿<html>
+
+
+<body>
+
+        <div id="GestoreProfili">
+            <fieldset>
+                <legend>Profili</legend>
+                <h2>Profili configurati (<span data-bind="text: profili().length"></span>)</h2>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>N°</th>
+                            <th>Codice</th>
+                            <th>Descrizione</th>
+                            <th>Profilo</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+
+                    <tbody data-bind="foreach: profili">
+                        <tr>
+                            <td data-bind="text : $index"></td>
+                            <td data-bind="text: uocodematricola" /></td>
+                            <td data-bind="text: descrizione" /></td>
+                            <td><select data-bind="options: $root.profiliAvviabili, value: profilo, optionsText: 'Descrizione'"></select></td>
+                            <td><a href="#" data-bind='click: $root.removeProfilo'>Rimuovi</a></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <script>
+
+            // Class to represent a row in the seat reservations grid
+            function ProfiloConfigurazione(istituto, uocodematricola, descrizione, IsUocode, initialprofilo) {
+                var self = this;
+                self.uocodematricola = uocodematricola;
+                self.istituto= istituto,
+                self.IsUocode = IsUocode;
+                self.descrizione = descrizione;
+                self.profilo = ko.observable(initialprofilo);
+                self.profiloPrec = initialprofilo;
+
+                this.profiloDelay = ko.pureComputed(this.profilo)
+                    .extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 500 } })
+                    .subscribe(function (val) {
+                        console.log("guid:" + JSON.stringify(guid));
+                        console.log("val:" + JSON.stringify(val));
+                        console.log("profilo:" + JSON.stringify(self.profilo()));
+                        console.log("profiloPrec:" + JSON.stringify(self.profiloPrec));
+
+                        if (val !== '' && self.profiloPrec && self.profilo() && self.profiloPrec.Nome && self.profilo().Nome && self.profiloPrec.Nome != self.profilo().Nome) {
+                            console.log(JSON.stringify(val));
+                            self.profiloPrec = val;
+                            var url = "@Url.Action("SetProfilo", "Richiesta")";
+                            var data = {
+                                guid: guid,
+                                istituto: self.istituto,
+                                uocodematricola: self.uocodematricola,
+                                profilo: val.Nome
+                            };
+                            $.post(url, data, function (dato) {
+                                console.log(JSON.stringify(dato));
+/*                                self.loggedValues.push(JSON.stringify(dato));*/
+
+                                var result = dato.result;
+                                if (result > 0) {
+                                    //self.getStato();
+                                    alert('Aggiornamento non completato, dati foglio ricaricati perchè modificato da altro utente.');
+                                }
+                            });
+                        }
+                    }, this);
+            }
+
+            // Overall viewmodel for this screen, along with initial state
+            function AmministrazioneViewModel() {
+                var self = this;
+
+                // Non-editable catalog data - would come from the server
+                self.profiliAvviabili =[];
+
+                this.getprofiliAvviabili= function () {
+                    var url = "@Url.Action("getprofiliAvviabili", "Richiesta")";
+                    var data = {};
+                    $.getJSON(url, data, function (allData) {
+                        console.log("getprofiliAvviabili: " + JSON.stringify(allData));
+                        allData.forEach(function (e) {
+                            console.log("Profilo Avviabile:" + JSON.stringify(e));
+                            self.profiliAvviabili.push(e);
+                        });
+                        console.log("profiliAvviabili:" + JSON.stringify(self.profiliAvviabili));
+                        self.getProfili();
+                    });
+                };
+                this.getprofiliAvviabili();
+
+
+                self.profili = ko.observableArray([]);
+
+                self.maxCol = ko.computed(function () { return self.profili().length - 1 });
+
+                var rowversionFoglio;
+
+                //self.addColonna = function () {
+                //    self.colonne.push(new ProfiloConfigurazione("", "",self.profiliAvviabili[0]));
+                //}
+                self.removeProfilo = function (profilo) {
+                    console.log("Remove Profilo:" + JSON.stringify(profilo));
+                                        var url = "@Url.Action("RemoveProfilo", "Richiesta")";
+                            var data = {
+                                guid: guid,
+                                istituto: profilo.istituto,
+                                uocodematricola: profilo.uocodematricola,
+                                IsUocode: profilo.IsUocode,
+                            };
+                            $.post(url, data, function (dato) {
+                                console.log(JSON.stringify(dato));
+                                var result = dato.result;
+                                if (result > 0) {
+                                   /* self.getStato();*/
+                                    alert('Profilo non rimosso.');
+                                }
+                                self.getProfili();
+                            });
+                    /*self.profili.remove(profilo)*/
+                }
+
+                this.getProfili = function () {
+                    var url = "@Url.Action("getProfiliWL", "Richiesta")";
+                    var data = {
+                            guid: guid,
+                    };
+                    $.getJSON(url, data, function (allData) {
+                        /*self.NomeLista(allData.NomeLista);*/
+                        self.rowversionFoglio = allData.RowVersion;
+                        self.profili.removeAll();
+                        allData.ProfiliWL.forEach(function (e) {
+                            console.log("getProfiliWL:" + JSON.stringify(e));
+                            var profilo = self.profiliAvviabili.filter(function (x) { return x.Nome === e.profilo.Nome })[0];
+
+                            /*console.log("profilo:" + JSON.stringify(profilo));*/
+                            self.profili.push(new ProfiloConfigurazione(e.istID, e.uocodematricola, e.descrizione, e.IsUocode, profilo));
+                        });
+                       /* console.log("allData:" + JSON.stringify(allData));*/
+                        /*console.log("Nome lista:" + JSON.stringify(self.NomeLista()));*/
+                        console.log("rowversionFoglio:" + JSON.stringify(self.rowversionFoglio));
+                    });
+                };
+
+                this.addProfilo = function (istituto, uocodematricola, IsUocode) {
+                    console.log("uocodematricola:" + uocodematricola);
+                    console.log("IsUocode:" + IsUocode);
+                    var url = "@Url.Action("AddProfilo", "Richiesta")";
+                            var data = {
+                                guid: guid,
+                                istituto: istituto,
+                                uocodematricola: uocodematricola,
+                                IsUocode: IsUocode,
+                            };
+                            $.post(url, data, function (dato) {
+                                console.log("AddProfilo:"+JSON.stringify(dato));
+                                var result = dato.result;
+                                if (result > 0) {
+                                   /* self.getStato();*/
+                                    alert('Profilo non aggiunto.');
+                                }
+                                self.getProfili();
+                            });
+
+                };
+
+
+            }
+                    var AmministrazioneViewModel = new AmministrazioneViewModel();
+                    ko.applyBindings(AmministrazioneViewModel, document.getElementById("GestoreProfili"));
+                </script>
+            </fieldset>
+        </div>
+
+
+</body>
+</html>
+
+
+
+

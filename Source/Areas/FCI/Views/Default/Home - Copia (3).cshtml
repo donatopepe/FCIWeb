@@ -1,0 +1,560 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout_10.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=11" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+    <!--<script src="https://polyfill.io/v3/polyfill.min.js?features=es5,es6,es7&flags=gated"></script>-->
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/7.8.3/polyfill.min.js" type="text/javascript"></script>*@
+    <!--<script src="@Url.Content("~/Scripts/babel.min.js")" ></script>-->
+
+
+    <script src="@Url.Content("~/Scripts/knockout-3.5.1.js")"></script>
+    <script src="@Url.Content("~/Scripts/jexcel_custom/jexcel.js")"></script>
+    <script src="@Url.Content("~/Scripts/jexcel_custom/jsuites.js")"></script>
+    <link rel="stylesheet" href="@Url.Content("~/Scripts/jexcel_custom/jsuites.css")" type="text/css" />
+    <link rel="stylesheet" href="@Url.Content("~/Scripts/jexcel_custom/jexcel.css")" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Material+Icons" />
+
+    <meta name="viewport" content="width=device-width" />
+    <title>Home</title>
+</head>
+<body>
+    <div>
+        @using (Html.BeginForm("Home", "Default", new { }, FormMethod.Post, new { enctype = "multipart/form-data", id = "Form" }))
+        {
+            <div>
+                <div>
+                    @*<input type="file" name="FileForm" id="FileForm" />*@
+                    @*@Html.Editor("FileForm", new { htmlAttributes = new { @type = "file", @class = "form-control" } })*@
+                    <input onchange="validateFile(this)" class="form-control text-box single-line" id="FileForm" name="FileForm" type="file" value="" />
+                    @Html.ValidationMessage("FileForm", "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <button class="bottone_submit" name="operationType" value="AddFile" type="submit" id="btnAddAllegato">Salva File</button>
+                </div>
+            </div>
+        }
+    </div>
+
+    @*<select id="columnNumber">
+        <option value="0">Column 0</option>
+        <option value="1">Column 1</option>
+        <option value="2">Column 2</option>
+    </select>
+
+    <input type="button" value="Set header title" onclick="table.setHeader(document.getElementById("columnNumber").value)" />*@
+    @*<input type="button" value="Get header title" onclick="table.getHeader(document.getElementById("columnNumber").value)" />*@
+
+    @*<input type="button" value="hideColumn" onclick="table.hideColumn(document.getElementById("columnNumber").value)" />
+    <input type="button" value="showColumn" onclick="table.showColumn(document.getElementById("columnNumber").value)" />*@
+
+    <div id="spreadsheet"></div>
+    <div id="log"></div>
+
+    @*<input type="button" value="Download selected tab" onclick="download()" style="width:150px;">*@
+
+<script>
+        //var undo = false; //implementazione logica di cella in sola lettura, ma non serve
+        //var prec;
+        var changed = function (instance, cell, x, y, value) {
+            var cellName = jexcel.getColumnNameFromId([x, y]);
+            console.log("New change on cell " + cellName + " to: " + value + "");
+
+
+            //implementazione logica di cella in sola lettura, ma non serve
+            //if (cellName == "D4" && !undo) {
+            //    undo = true;
+            //    var worksheet = document.getElementById("spreadsheet").children[0].querySelector(".selected").getAttribute("data-spreadsheet");
+            //    document.getElementById("spreadsheet").jexcel[worksheet].undo();
+            //    document.getElementById("spreadsheet").jexcel[worksheet].setValue(cellName, prec, true);
+            //} else {
+            //    undo = false;
+            //}
+
+            var url = "@Url.Action("UpdateCella", "Default")";
+
+            var data = {
+                guid: guid,
+                cellName: cellName,
+                value: value
+            };
+            $.post(url, data, function (data) {
+                console.log(JSON.stringify(data));
+                SetDataTable();
+            });
+
+        }
+
+        var beforeChange = function (instance, cell, x, y, value) {
+            var cellName = jexcel.getColumnNameFromId([x, y]);
+            console.log("The cell " + cellName + " will be changed " + value);
+            //implementazione logica di cella in sola lettura, ma non serve
+            //if (cellName == "D4") {
+            //    var worksheet = document.getElementById("spreadsheet").children[0].querySelector(".selected").getAttribute("data-spreadsheet");
+            //    prec = document.getElementById("spreadsheet").jexcel[worksheet].getValue(cellName);
+            //}
+        }
+
+        var insertedRow = function (instance) {
+            console.log("Row added");
+        }
+
+        var insertedColumn = function (instance) {
+            console.log("Column added");
+        }
+
+        var deletedRow = function (instance) {
+            console.log("Row deleted");
+        }
+
+        var deletedColumn = function (instance) {
+            console.log("Column deleted");
+        }
+
+        var sort = function (instance, cellNum, order) {
+            var order = (order) ? "desc" : "asc";
+            console.log("The column  " + cellNum + " sorted by " + order + "");
+        }
+
+        var resizeColumn = function (instance, cell, width) {
+            console.log("The column  " + cell + " resized to width " + width + " px");
+        }
+
+        var resizeRow = function (instance, cell, height) {
+            console.log("The row  " + cell + " resized to height " + height + " px");
+        }
+
+        var selectionActive = function (instance, x1, y1, x2, y2, origin) {
+            var cellName1 = jexcel.getColumnNameFromId([x1, y1]);
+            var cellName2 = jexcel.getColumnNameFromId([x2, y2]);
+            console.log("The selection from " + cellName1 + " to " + cellName2 + "");
+        }
+
+        var loaded = function (instance) {
+            console.log("New data is loaded");
+        }
+
+        var moveRow = function (instance, from, to) {
+            console.log("The row " + from + " was move to the position of " + to + "");
+        }
+
+        var moveColumn = function (instance, from, to) {
+            console.log("The col " + from + " was move to the position of " + to + "");
+        }
+
+        var blur = function (instance) {
+            console.log("The table " + $(instance).prop("id") + " is blur");
+        }
+
+        var focus = function (instance) {
+            console.log("The table " + $(instance).prop("id") + " is focus");
+        }
+
+        var paste = function (data) {
+            console.log("Paste on the table " + $(instance).prop("id") + "");
+        }
+
+        var toolbar = [
+            {
+                type: "i",
+                content: "undo",
+                onclick: function () {
+                    //var worksheet = document.getElementById("spreadsheet").children[0].querySelector(".selected").getAttribute("data-spreadsheet");
+                    //document.getElementById("spreadsheet").jexcel[worksheet].undo();
+                    table.undo();
+                }
+            },
+            {
+                type: "i",
+                content: "redo",
+                onclick: function () {
+                    //var worksheet = document.getElementById("spreadsheet").children[0].querySelector(".selected").getAttribute("data-spreadsheet");
+                    //document.getElementById("spreadsheet").jexcel[worksheet].redo();
+                    table.redo();
+                }
+            },
+            {
+                type: "i",
+                content: "save",
+                onclick: function () {
+                    /*table.download();*/
+                    //console.log(JSON.stringify(table.getStyle()) + "</br>");
+                    //console.log(JSON.stringify(table.getJson()) + "</br>");
+                    download();
+
+                }
+            },
+            {
+                type: "select",
+                k: "font-family",
+                v: ["Arial", "Verdana"]
+            },
+            {
+                type: "select",
+                k: "font-size",
+                v: ["9px", "10px", "11px", "12px", "13px", "14px", "15px", "16px", "17px", "18px", "19px", "20px"]
+            },
+            {
+                type: "i",
+                content: "format_align_left",
+                k: "text-align",
+                v: "left"
+            },
+            {
+                type: "i",
+                content: "format_align_center",
+                k: "text-align",
+                v: "center"
+            },
+            {
+                type: "i",
+                content: "format_align_right",
+                k: "text-align",
+                v: "right"
+            },
+            {
+                type: "i",
+                content: "format_bold",
+                k: "font-weight",
+                v: "bold"
+            },
+            {
+                type: "color",
+                content: "format_color_text",
+                k: "color"
+            },
+            {
+                type: "color",
+                content: "format_color_fill",
+                k: "background-color"
+            },
+        ];
+
+        var contextMenu = function (obj, x, y, e) {
+            var items = [];
+
+            if (y == null) {
+                // Insert a new column
+                if (obj.options.allowInsertColumn == true) {
+                    items.push({
+                        title: obj.options.text.insertANewColumnBefore,
+                        onclick: function () {
+                            var url = "@Url.Action("InsertCol", "Default")";
+                            var data = {
+                                guid: guid,
+                                x: parseInt(x),
+                                Before: 1
+                            };
+                            $.post(url, data, function (data) {
+                                console.log(JSON.stringify(data));
+                                SetDataTable();
+                                obj.insertColumn(1, parseInt(x), 1);
+                            });
+                           
+                        }
+                    });
+                }
+
+                if (obj.options.allowInsertColumn == true) {
+                    items.push({
+                        title: obj.options.text.insertANewColumnAfter,
+                        onclick: function () {
+                            var url = "@Url.Action("InsertCol", "Default")";
+                            var data = {
+                                guid: guid,
+                                x: parseInt(x),
+                                Before: 0
+                            };
+                            $.post(url, data, function (data) {
+                                console.log(JSON.stringify(data));
+                                SetDataTable();
+                                 obj.insertColumn(1, parseInt(x), 0);
+                            });
+                           
+                        }
+                    });
+                }
+
+                // Delete a column
+                if (obj.options.allowDeleteColumn == true) {
+                    items.push({
+                        title: obj.options.text.deleteSelectedColumns,
+                        onclick: function () {
+                            var url = "@Url.Action("DeleteCol", "Default")";
+                            var data = {
+                                guid: guid,
+                                x: parseInt(x),
+                                Before: 0
+                            };
+                            $.post(url, data, function (data) {
+                                console.log(JSON.stringify(data));
+                                SetDataTable();
+                                obj.deleteColumn(obj.getSelectedColumns().length ? undefined : parseInt(x));
+                            });
+                            
+                        }
+                    });
+                }
+
+                // Rename column
+                if (obj.options.allowRenameColumn == true) {
+                    items.push({
+                        title: obj.options.text.renameThisColumn,
+                        onclick: function () {
+                            obj.setHeader(x);
+                            console.log(parseInt(x)+":"+obj.getHeader(x));
+                            var url = "@Url.Action("RenameCol", "Default")";
+                            var data = {
+                                guid: guid,
+                                x: parseInt(x),
+                                title: obj.getHeader(x),
+                               };
+                            $.post(url, data, function (data) {
+                                console.log(JSON.stringify(data));
+                                SetDataTable();
+                            });
+                            /*console.log(obj.getHeaders());*/
+                        }
+                    });
+                }
+
+                // Sorting
+                if (obj.options.columnSorting == true) {
+                    // Line
+                    /*                    items.push({ type: "line" });*/
+
+                    items.push({
+                        title: obj.options.text.orderAscending,
+                        onclick: function () {
+                            obj.orderBy(x, 0);
+                        }
+                    });
+                    items.push({
+                        title: obj.options.text.orderDescending,
+                        onclick: function () {
+                            obj.orderBy(x, 1);
+                        }
+                    });
+                }
+            } else {
+                // Insert new row
+                if (obj.options.allowInsertRow == true) {
+                    items.push({
+                        title: obj.options.text.insertANewRowBefore,
+                        onclick: function () {
+                            var url = "@Url.Action("InsertRow", "Default")";
+                            var data = {
+                                guid: guid,
+                                y: parseInt(y),
+                                Before: 1
+                            };
+                            $.post(url, data, function (data) {
+                                console.log(JSON.stringify(data));
+                                SetDataTable();
+                            });
+/*                            obj.insertRow(1, parseInt(y), 1);*/
+                        }
+                    });
+
+                    items.push({
+                        title: obj.options.text.insertANewRowAfter,
+                        onclick: function () {
+                            var url = "@Url.Action("InsertRow", "Default")";
+                            var data = {
+                                guid: guid,
+                                y: parseInt(y),
+                                Before: 0
+                            };
+                            $.post(url, data, function (data) {
+                                console.log(JSON.stringify(data));
+                                SetDataTable();
+                            });
+                         /*   obj.insertRow(1, parseInt(y));*/
+                        }
+                    });
+                }
+
+                if (obj.options.allowDeleteRow == true) {
+                    items.push({
+                        title: obj.options.text.deleteSelectedRows,
+                        onclick: function () {
+                             var url = "@Url.Action("DeleteRow", "Default")";
+                            var data = {
+                                guid: guid,
+                                y: parseInt(y),
+                            };
+                            $.post(url, data, function (data) {
+                                console.log(JSON.stringify(data));
+                                SetDataTable();
+                                
+                            });
+                        /*    obj.deleteRow(obj.getSelectedRows().length ? undefined : parseInt(y));*/
+                        }
+                    });
+                }
+
+                if (x) {
+                    if (obj.options.allowComments == true) {
+                        items.push({ type: "line" });
+
+                        var title = obj.records[y][x].getAttribute("title") || "";
+
+                        items.push({
+                            title: title ? obj.options.text.editComments : obj.options.text.addComments,
+                            onclick: function () {
+                                obj.setComments([x, y], prompt(obj.options.text.comments, title));
+                            }
+                        });
+
+                        if (title) {
+                            items.push({
+                                title: obj.options.text.clearComments,
+                                onclick: function () {
+                                    obj.setComments([x, y], "");
+                                }
+                            });
+                        }
+                    }
+                }
+            }
+
+            //// Line
+            //items.push({ type: "line" });
+
+            //// Save
+            //if (obj.options.allowExport) {
+            //    items.push({
+            //        title: obj.options.text.saveAs,
+            //        shortcut: "Ctrl + S",
+            //        onclick: function () {
+            //            obj.download();
+            //        }
+            //    });
+            //}
+
+            //// About
+            //if (obj.options.about) {
+            //    items.push({
+            //        title: obj.options.text.about,
+            //        onclick: function () {
+            //            alert(obj.options.about);
+            //        }
+            //    });
+            //}
+
+            return items;
+        };
+
+        var download = function () {
+
+            console.log(JSON.stringify(table.getStyle()));
+            console.log(JSON.stringify(table.getJson()));
+        }
+    var table;
+    var url = "@Url.Action("Lista", "Default")";
+    var guid = "B07025A0-257E-43C2-A942-AA19170E4EF6";
+    function SetDataTable() {
+        var data = {
+            guid: guid,
+        };
+        $.getJSON(url, data, function (data) {
+            console.log(JSON.stringify(data));
+            guid = data.guid;
+            table.setData(data.data);
+            //for (var i = 0; i < table.headers.length; i++) {
+            //    $.map(data.columns, function (item) {
+
+            //    });
+            //}
+        });
+    };
+    function UpdateLista()
+    {
+        var data = {
+            guid: guid,
+        };
+
+
+        $.getJSON(url, data, function (data) {
+            console.log(JSON.stringify(data));
+            guid = data.guid;
+            var foglio = {
+/*                sheetName: "Countries",*/
+/*                minDimensions: [1, 1],*/
+                data: data.data,
+                columnSorting: true,
+                columns: data.columns,
+                style: data.style,
+                allowComments: false,
+                allowInsertColumn: true,
+                allowDeleteColumn: true,
+                allowRenameColumn: true,
+                contextMenu: contextMenu,
+                toolbar: toolbar,
+                rowResize: true,
+                columnDrag: true,
+                onchange: changed,
+                onbeforechange: beforeChange,
+                oninsertrow: insertedRow,
+                oninsertcolumn: insertedColumn,
+                ondeleterow: deletedRow,
+                ondeletecolumn: deletedColumn,
+                onselection: selectionActive,
+                onsort: sort,
+                onresizerow: resizeRow,
+                onresizecolumn: resizeColumn,
+                onmoverow: moveRow,
+                onmovecolumn: moveColumn,
+                onload: loaded,
+                onblur: blur,
+                onfocus: focus,
+                onpaste: paste,
+            };
+            $('#spreadsheet').empty();
+            table = jspreadsheet(document.getElementById("spreadsheet"), foglio);
+
+        });
+    };
+    UpdateLista();
+
+
+
+</script>
+
+</body>
+</html>
+
+
+
+
+<script>
+
+    function validateFile(input) {
+
+        var fileSize = input.files[0].size / 1024 / 1024; // in MiB
+        if (fileSize > 5) {
+            alert("File size eccede 5 MiB");
+            $("#FileForm").replaceWith($("#FileForm").val("").clone(true));
+        } else {
+
+        }
+        console.log("Validate size:" + fileSize);
+        var fileName = input.files[0].name;
+        console.log("Validate filename:" + fileName);
+        regex = new RegExp("(.*?)\.(xls|xlsx)$");
+
+        if (!(regex.test(fileName))) {
+            $("#FileForm").replaceWith($("#FileForm").val("").clone(true));
+            alert("Formato file non consentito");
+        }
+    }
+</script>

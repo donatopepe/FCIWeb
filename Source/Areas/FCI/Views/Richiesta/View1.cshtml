@@ -1,0 +1,128 @@
+﻿@model  FCIWeb.Areas.FCI.Models.ViewModel
+
+@{
+    ViewBag.Title = "View1";
+}
+@{
+    ViewBag.Title = "Autorizza UOCODE";
+    //Layout = "~/Views/Shared/_Layout_NoMenu.cshtml";
+    //Layout = "~/Views/Shared/_Layout_10n.cshtml";
+    Layout = "~/Views/Shared/_Layout_10.cshtml";
+    //Layout = "~/Areas/RCD/Views/Richieste/_Layout.cshtml";
+
+}
+<script src="@Url.Content("~/Scripts/knockout-3.5.1.js")"></script>
+<script>
+    var guidfogli = '@Model.guid';
+    var idprofilo = 1;
+    console.log("Guid fogli:" + guidfogli);
+
+</script>
+<h3>Tasks</h3>
+
+<form>
+    Add task: <input data-bind="value: newTaskText" placeholder="What needs to be done?" />
+
+    <button data-bind="click: addTask">Add</button>
+    <button data-bind="click: SalvaDato">Salva</button>
+
+</form>
+
+<ul data-bind="foreach: tasks, visible: tasks().length > 0">
+    <li>        
+        <input data-bind="value: wl_uocode" />
+        <a href="#" data-bind="click: $parent.removeTask">Delete</a>
+    </li>non l'ho capita '
+</ul>
+
+You have <b data-bind="text: incompleteTasks().length">&nbsp;</b> incomplete task(s)
+<span data-bind="visible: incompleteTasks().length == 0"> - it's beer time!</span>
+
+<script>
+
+    function Task(data) {
+        this.wl_uocode = ko.observable(data.wl_uocode);
+        //this.isDone = ko.observable(data.isDone);
+    }
+
+    function TaskListViewModel() {
+        // Data
+        var self = this;
+        self.tasks = ko.observableArray([]);
+        self.newTaskText = ko.observable();
+        self.incompleteTasks = ko.computed(function () {
+            return ko.utils.arrayFilter(self.tasks(), function (task) { return task.wl_uocode()!="" });
+        });
+
+
+        // Operations
+        self.addTask = function () {
+            self.tasks.push(new Task({ wl_uocode: this.newTaskText() }));
+            self.newTaskText("");
+        };
+        self.removeTask = function (task) { self.tasks.remove(task) };
+
+
+        function leggiuocode() {
+            var url = "@Url.Action("LeggiUOCode_WL", "Richiesta")";
+                            var data = {
+                                fogli_guid: guidfogli
+                                };
+
+            $.getJSON(url, data, function (allData) {
+               
+                console.log("alldata " + allData.uocode);
+                self.tasks.push(new Task({ wl_uocode: "prova" }));
+                //var mappedTasks = $.map(allData, function (item) { return new Task(item) });
+                //self.tasks(mappedTasks);
+            });
+
+
+        }
+        leggiuocode();
+
+        @*this.getDati = function () {
+                    var url = "@Url.Action("getColonne", "Richiesta")";
+                    var data = {
+                            guid: guid,
+                    };
+                    $.getJSON(url, data, function (allData) {
+                        
+                        self.rowversionFoglio = allData.RowVersion;
+                        allData.columns.forEach(function (e) {
+                            
+                            console.log("column:");
+                            console.log("name:"+e.name);
+                            console.log("type:" +e.tipo.type);
+                            console.log("source:" + e.tipo.source);
+                            var tipoavviabile = self.tipoAvviabili.filter(function (x) { return x.type === e.tipo.type })[0];
+                            tipoavviabile.source = e.tipo.source;
+                            console.log("tipoavviabile:" + JSON.stringify(tipoavviabile));
+                            self.colonne.push(new ColonnaConfigurazione(e.name, tipoavviabile));
+                        });
+                        console.log("rowversionFoglio:" + JSON.stringify(self.rowversionFoglio));
+                    });
+                };
+        this.getDati();*@
+
+
+        self.SalvaDato = function () {
+            var elementi = ko.toJSON(self.tasks());
+            console.log(elementi);
+            console.log(guidfogli);
+                            var url = "@Url.Action("AggiornaUocode", "Richiesta")";
+                            var data = {
+                                uocode: elementi,
+                                profilo: "1",
+                                fogli_guid: guidfogli
+                                };
+
+            $.post(url, data, function (dato) {
+
+            });
+        }
+
+    }
+
+    ko.applyBindings(new TaskListViewModel());
+</script>

@@ -1,0 +1,169 @@
+﻿@model  FCIWeb.Areas.FCI.Models.uocodeViewModel
+
+@{
+    ViewBag.Title = "AssociaUOCODE";
+}
+
+<h2>AssociaUOCODE </h2>
+<h2>@ViewBag.guid</h2>
+
+<style>
+    #UOCode_InoltroDesc {
+        width: 250px;
+    }
+
+    #Richiedente, #IndirizzoRichiedente, #LuogoNascitaRichiedente, #CodiceFiscaleRichiedente {
+        width: 400px;
+    }
+</style>
+
+@using (Html.BeginForm())
+{
+    <table>
+
+        <tr>
+            <td>
+                <div class="inoltronew form-group inoltrofiliale">
+
+                    @Html.Label("Filiale di Inoltro")
+                    <div class="col-md-10">
+                        @Html.Editor("UOCode_InoltroDesc", new { htmlAttributes = new { @class = "form-control" } })
+
+                    </div>
+                </div>
+            </td>
+            <td>
+                <input type="submit" class="btn" value="&gt;&gt;" name="Action" />
+
+                <input type="submit" class="btn" value="&lt;&lt;" name="Action" />
+            </td>
+            <td></td>
+        </tr>
+    </table>
+
+    @Html.ListBoxFor(m => m.valoreselzionato, Model.UOCodelist, new { size = 5 })
+    <form data-bind="submit: addTask">
+        Add task: <input data-bind="value: newTaskText" placeholder="What needs to be done?" />
+        <button type="submit">Add</button>
+    </form>
+    <ul data-bind="foreach: tasks, visible: tasks().length > 0">
+        <li>
+            <input type="checkbox" data-bind="checked: isDone" />
+            <input data-bind="value: title, disable: isDone" />
+            <a href="#" data-bind="click: $parent.removeTask">Delete</a>
+        </li>
+    </ul>
+    <div>
+        You have <b data-bind="text: incompleteTasks().length">&nbsp;</b> incomplete task(s)
+        <span data-bind="visible: incompleteTasks().length == 0"> - it's beer time!</span>
+    </div>
+
+    <fieldset id="GestoreColonne">
+        <legend>Autorizza UOCODE</legend>
+        <h2>UOCode autorizzati (<span data-bind="text: colonne().length"></span>)</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>N°</th>
+                    <th>uocode</th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            <tbody data-bind="foreach: colonne">
+                <tr>
+                    <td data-bind="text : $index"></td>
+                    <td><input data-bind="value: name" /></td>
+                    <td><select data-bind="options: $root.tipoAvviabili, value: tipo, optionsText: 'nomeTipo'"></select></td>
+                    <td><input data-bind="value: tipo().source, visible: tipo().type=='dropdown' " /></td>
+                    <td><a href="#" data-bind="click: $root.removeColonna">Rimuovi</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <button data-bind="click: addColonna">Aggiungi uocode</button>
+        <button data-bind="click: Salva">Salva e aggiorna</button>
+
+
+        <script>
+            function Task(data) {
+                this.title = ko.observable(data.title);
+                this.isDone = ko.observable(data.isDone);
+            }
+
+            function TaskListViewModel() {
+                // Data
+                var self = this;
+                self.tasks = ko.observableArray([]);
+                self.newTaskText = ko.observable();
+                self.incompleteTasks = ko.computed(function () {
+                    return ko.utils.arrayFilter(self.tasks(), function (task) { return !task.isDone() });
+                });
+
+                // Operations
+                self.addTask = function () {
+                    self.tasks.push(new Task({ title: this.newTaskText() }));
+                    self.newTaskText("");
+                };
+                self.removeTask = function (task) { self.tasks.remove(task) };
+            }
+
+            ko.applyBindings(new TaskListViewModel());
+        </script>
+    </fieldset>
+
+
+
+}
+
+<script>
+    $(function() {
+        debugger;
+        console.log("autocomplete uocode");
+        $("#UOCode_InoltroDesc").autocomplete(
+            {
+            source: function(request, response) {
+                var url = '@Url.Action("GetPossibiliInoltri", "Richiesta")';
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    dataType: "json",
+                    data: {
+                        prefix: request.term
+                    },
+                    success: function(data) {
+                        response($.map(data,
+                            function(item) {
+
+                                return { label: item.DescrizioneUO, value: item.UOCode +' - '+ item.DescrizioneUO, id: item.UOCode };
+                            }))
+                    }
+                });
+            },
+            minLength: 3,
+            select: function(e, ui) {
+
+                if ((ui.item)) {
+                    console.log("ui.item", ui.item);
+                    /*$('#SelezioneUffici').val("");*/
+                    $("#UOCode_Inoltro").val(ui.item.id);
+                }
+
+
+            },
+            change: function(e, ui) {
+                if (!(ui.item)) {
+                    e.target.value = "";
+                    /*$('#SelezioneUffici').val("");*/
+                    $("#UOCode_Inoltro").val("");
+                }
+            },
+            open: function() {
+                $(this).removeClass("ui-corner-all").addClass("ui-corner-top");
+            },
+            close: function() {
+                $(this).removeClass("ui-corner-top").addClass("ui-corner-all");
+            }
+        }).val('@ViewData["UOCode_InoltroC"]');
+    });
+</script>

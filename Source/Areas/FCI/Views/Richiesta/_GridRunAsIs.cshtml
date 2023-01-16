@@ -1,0 +1,62 @@
+﻿@using System.Configuration
+@using System.Web.Hosting
+@using AreaCommonWeb.DAL
+@using AreaCommonWeb.ModelView.Security
+@{
+    ViewBag.Title = "_GridRunAsIs";
+}
+@model Dictionary<string,string>
+
+<script type="text/javascript">
+  @*function runAsIs(istituto, matricola) {
+    
+    var nomePortale = '@ConfigurationManager.AppSettings["NomePortale"]';
+    //var localpath = '@HostingEnvironment.MapPath("~/")';
+    
+    $.ajax({
+      url: '@Url.Action("resetUtenza", "Utenza")',
+      type: 'POST',
+      async: false,
+      cache: false,
+      processData: false,
+      success: function (data) {
+        var url = "" + nomePortale + "/Account/setUtenzaTest?UtenzaTest=&istituto=" + istituto + "&matricola=" + matricola;
+        window.location.href = url;
+      }
+    });
+  }*@
+
+  function datagrid(parameters) {
+    return  {
+      UocodeSelez : '@Model.First().Key',
+      MatricolaSelez : '@Model.First().Value'
+        
+    };
+  }
+</script>
+@(Html.Kendo().Grid<vw_Prof_Resource>()
+    .Name("GridRunAsIS")
+    .Columns(columns =>
+               {
+                 columns.Bound(o => o.Matricola).ClientTemplate("<input type=\"button\" class=\"gridGotoTask\" onclick=\"return runAsIs(#= CodIstituto #,'#= Matricola #')\"/>").Title("").HtmlAttributes(new { @nowrap = "nowrap" }).Filterable(false);
+                 columns.Bound(o => o.CodIstituto);
+                 columns.Bound(o => o.Matricola);
+                 columns.Bound(o => o.LastName).ClientTemplate("#=data.LastName# #=data.FirstName#").Title("Nominativo");
+                 columns.Bound(o => o.MansioneNormalizzata).Title("Mansione");
+                 columns.Bound(o => o.DescrizioneUO).Title("Unità org.");
+
+
+
+
+               })
+    .DataSource(dataSource => dataSource
+                                    .Ajax()
+                                    
+                                    .Read(read => read.Action("_GridElencoUtentiForRunAsIs", "Richiesta").Data("datagrid"))
+        )
+    .Resizable(resize => resize.Columns(true))
+    .Sortable(sorting => sorting.Enabled(true))
+    .Scrollable(scrolling => scrolling.Enabled(false))
+    .Pageable(paging => paging.Enabled(true).Messages(m => m
+                                                             .Display("{0} - {1} di {2} elementi")
+                                                             .Empty("Nessun elemento trovato"))))

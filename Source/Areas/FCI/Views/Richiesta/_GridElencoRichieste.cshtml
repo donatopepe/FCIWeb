@@ -1,0 +1,288 @@
+﻿@model IEnumerable<FCIWeb.Areas.FCI.Models.Fogli>
+
+@{
+    ViewBag.Title = "Elenco Liste";
+    //Layout = "~/Views/Shared/_Layout_10.cshtml";
+}
+
+<style>
+    table.TabellaRCD2 {
+    }
+
+        table.TabellaRCD2 td, table.TabellaRCD2 th {
+            border: 1px solid #E0E0E0;
+        }
+
+        table.TabellaRCD2 tr:nth-child(even) {
+            background: #ECECEC;
+        }
+
+</style>
+
+<h2>Elenco Liste</h2>
+
+
+
+@*<div class="tab-content">
+    <div class="tab-pane container active p-0" id="home" style="margin-top:15px;">
+    <table id="indexTable" class="table table-bordered blueTable" >*@
+
+<div class="" style="max-width: 940px; display: block; overflow: hidden;">
+    <div class="" id="home">
+        <table id="indexTable" class="TabellaRCD2" style="">
+            <thead class="k-grid-header" style="font-size:8pt">
+                <tr>
+                    <th class=""></th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.NomeLista)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Stato)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Struttura)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Addetto)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AddettoUltimaModifica)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UltimaModifica)
+                    </th>
+
+                    <th class=""></th>
+                    <th class=""></th>
+                </tr>
+            </thead>
+            <tbody style="font-size:9pt"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="finestralogstati" style="display: none">
+</div>
+
+<script type="text/javascript">
+
+    function CovertiDataAspNet(item) {
+        if ((item != null) && (String(item).substring(0, 5) == "/Date")) {
+
+            @* $('#DataPagamento').val(new Date(Date.parse('@Model.DataPagamento')).format("yyyy-MM-dd"));
+            $('#DataSottoscrizione').val(new Date(Date.parse('@Model.DataSottoscrizione')).format("yyyy-MM-dd"));*@
+
+            item = String(item).replace("/Date(", "").replace(")/", "");
+            var dateObj = new Date(+item);
+            var month = dateObj.getMonth() + 1; //months from 1-12
+            var day = dateObj.getDate();
+            var year = dateObj.getFullYear();
+            item = ("000" + day).slice(-2) + "/" + ("000" + month).slice(-2) + "/" + year;
+            //console.log("data trovata:" + item);
+
+        }
+        return item;
+    }
+
+    function LogStati(id) {
+        console.log("LogStati " + id);
+        var url = '@Url.Action("LogStati", "Richiesta")';
+                                dato = {
+                                    id: id
+                                };
+        
+                                $.ajax({
+                                    url: url,
+                                    data: dato,
+                                    type: "POST",
+                                    error: function (xhr) {
+                                        alert('Error: ' + xhr.statusText);
+                                    },
+                                    success: function (result) {
+                                        console.log("Genero tabella LogStati");
+                                        var opt = {
+                                            autoOpen: false,
+                                            modal: true,
+                                            width: "auto",
+                                            height: "auto",
+                                            title: 'Log Stati',
+                                            buttons: {
+                                                Close: function () {
+                                                    $(this).dialog("close");
+                                                    $(this).dialog("destroy");
+                                                }
+                                            },
+                                        };
+                                        $('#finestralogstati').html(result);
+                                        $('#finestralogstati').dialog(opt).dialog('open');
+                                    }
+                                });
+    }
+
+    function Gestione(id) {
+        var url = '@Url.Action("ApriRichiesta", "Richiesta")';
+                                dato = {
+                                    Guid: id
+        };
+        $("#loading").css("display", "block");
+                                console.log(dato);
+                                $.ajax({
+                                    url: url,
+                                    data: dato,
+                                    type: "GET",
+                                    error: function (xhr) {
+                                        $("#loading").css("display", "none");
+                                        alert('Error: ' + xhr.statusText);
+                                    },
+                                    success: function (result) {
+                                        $("#loading").css("display", "none");
+                                        console.log("Popolo div dettaglio");
+
+                                        $('#dettaglio').html(result);
+
+                                    }
+                                });
+    }
+
+    function Dettagli(id) {
+        var url = '@Url.Action("Details", "Richiesta")';
+                                dato = {
+                                    Guid: id
+        };
+        $("#loading").css("display", "block");
+                                console.log(dato);
+                                $.ajax({
+                                    url: url,
+                                    data: dato,
+                                    type: "GET",
+                                    error: function (xhr) {
+                                        $("#loading").css("display", "none");
+                                        alert('Error: ' + xhr.statusText);
+                                    },
+                                    success: function (result) {
+                                        $("#loading").css("display", "none");
+                                        console.log("Popolo div dettaglio");
+
+                                        $('#dettaglio').html(result);
+
+                                    }
+                                });
+    }
+
+    function LeggiRichieste() {
+
+        var data = @Html.Raw(Json.Encode(Model));
+
+        $("#indexTable").DataTable({
+            "language": {
+                url: '@Url.Content("~/Scripts/DataTables/it_it.json")'
+            },
+            destroy: true,
+            data: data,
+            deferRender: true,
+            scrollX: false,
+            scrollY: 400,
+            scrollCollapse: true,
+            scroller: true,
+            searching: true,
+            paging: true,
+            info: false,
+            columnDefs: [
+                {
+
+                }
+            ],
+            "columns": [
+                {
+                    'data': null,
+                    title: '',
+                    wrap: true,
+                    "orderable": false,
+                    "render": function (item) {
+                        var Id = "'" + item.Guid + "'";
+                        var urlimage = "'@Url.Content("~/Content/img/LogIcon.png")'";
+                        var html = '<img onclick="LogStati(';
+                        html += Id + ')" src=' + urlimage + ' style="cursor: pointer;" />';
+                        console.log("html:" + html);
+                        return html;
+                    }
+                },
+                { "data": "NomeLista" },
+                { "data": "Stato.Descrizione" },
+                { "data": "Struttura" },
+                { "data": "Addetto" },
+                { "data": "AddettoUltimaModifica" },
+                {
+                    "data": "UltimaModifica",
+                    "render": function (item) {
+                        return CovertiDataAspNet(item);
+                    } },
+
+                {
+                    'data': null,
+                    title: '',
+                    wrap: true,
+                    "orderable": false,
+                    "render": function (item) {
+
+                        var Id = "'" + item.Guid + "'";
+                        var urlimage = "'@Url.Content("~/Content/img/cerca.gif")'";
+                        var html = '<img onclick="Dettagli(';
+                        html += Id + ')" src=' + urlimage + ' style="cursor: pointer;" />';
+                        return html;
+                    }
+                },
+                {
+                    'data': null,
+                    title: '',
+                    wrap: true,
+                    "orderable": false,
+                    "render": function (item) {
+                        console.log("item.Guid ") + item.Guid
+                        console.log("item.istID " + item.istID);
+                        console.log("item.UOCode " + item.UOCode);
+                        console.log("item.Guid " + item.Guid);
+                        ///da valutare bene
+                        //if ((item.istID!="@ViewData["istituto"]")||(item.UOCode !=  "@ViewData["uocode"]")) return '';
+                        //if (item.Stato.Chiuso) return '';
+                        var Id = "'" + item.Guid + "'";
+                        var urlimage = "'@Url.Content("~/Content/img/edit_icon.png")'";
+                        var html = '<img onclick="Gestione(';
+                        html += Id + ')" src=' + urlimage + ' style="cursor: pointer;" />';
+                        
+                        return html;
+                    }
+                },
+
+
+            ],
+
+
+
+        });
+
+
+    };
+
+    $(document).ready(function () {
+
+
+
+        LeggiRichieste();
+
+                if ((ApriRichiestaId != "") && (ApriRichiestaId !="@Guid.Empty")) Dettagli(ApriRichiestaId);
+
+    });
+</script>
+
+
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#containerTop").css("height", "auto");
+
+        $("div[id='loading']").each(function (index) {
+            $(this).css("display", "none");
+        });
+    });
+</script>
