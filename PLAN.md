@@ -30,16 +30,16 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 8 | `docs/ANALISI-CODICE.md` | ✅ | file |
 | 9 | `PLAN.md` | ✅ | questo file |
 | 10 | `docs/PROMPT-INGEGNERIZZATO.md` | ✅ | file |
-| 11 | CI verde: validazione statica | 🔄 | workflow presente; run reale da fare (serve push) |
-| 12 | CI verde: build + test cross-platform `.NET 8` | ✅* | `dotnet test` in Docker → 26/26 passati |
+| 11 | CI verde: validazione statica | ✅ | run GitHub `38876403094` job "Validazione statica" → success |
+| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | run `38876403094` job "Build + test cross-platform" → success (26 test) |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
-| 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/sei/terze parti) | ⏳ | fase M4 |
+| 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ⏳ | fase M4 |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-\* criterio 12: test eseguiti localmente in container; il run in CI GitHub resta da attivare (criterio 11).
-
-**Misurato al ciclo 3**: **13/16 = 0.8125** ✅ sopra soglia baseline.
+**Misurato al ciclo 4**: **15/16 = 0.9375**, sopra la soglia obiettivo (0.92) per i criteri
+"public-ready". La completezza **funzionale** cross-platform è tracciata separatamente dalle fasi
+M2–M8 (attualmente M0/M1 fatte).
 
 ## 3. Fatti verificati
 
@@ -144,6 +144,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 1 | 2026-10-16 | Baseline igiene + docs + CI statica | ✅ | `check-secrets.sh` OK, `validate-config.sh` OK |
 | 2 | 2026-10-16 | Rimozione segreti (tree+history), esclusione dipendenze proprietarie | ✅ | filter-repo ×2, `git grep` su storia = 0, `.git` 3 MB |
 | 3 | 2026-10-16 | Avvio cross-platform: soluzione .NET 8, utility portate, 26 test, CI, doc porting | ✅ | `dotnet test` → 26/26 in Docker Linux |
+| 4 | 2026-10-16 | Pubblicazione repo pubblico pulito + CI verde | ✅ | [run 38876403094](https://github.com/donatopepe/FCIWeb/actions/runs/38876403094): validate ✅, crossplatform ✅, legacy ⚠️ |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -161,6 +162,18 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - `dotnet test` in `mcr.microsoft.com/dotnet/sdk:8.0` → **Passed: 26, Failed: 0**.
 - CI: job `crossplatform` bloccante (build `/warnaserror` + test + artifact TRX).
 - `docs/PORTING-CROSS-PLATFORM.md` (strategia strangler, mappa di conversione, fasi M0–M8).
+
+### Dettaglio ciclo 4 (pubblicazione)
+
+- **Incidente rilevato e corretto**: il primo push conteneva in `PLAN.md` i valori letterali dei
+  segreti (a scopo di verifica). Rilevato con `git grep` su clone fresco → il repo pubblico è stato
+  **cancellato e ricreato** per eliminare gli oggetti orfani; la documentazione ora non contiene i
+  valori e la deny-list è locale (`.secrets-denylist`, non versionata).
+- Nuovo repo pubblico: <https://github.com/donatopepe/FCIWeb> (branch `master`).
+- Vecchio repo privato `FCIWeb-legacy-backup` (conteneva i segreti originali) eliminato da GitHub;
+  backup locale in `/root/fciweb-remote-backup.git`.
+- Verifica su **clone fresco**: 0 hit di segreti nella history, 0 binari tracciati, working tree pulito.
+- CI: primo run verde (validazione statica + cross-platform).
 
 ## 11. Stato pubblicazione
 
