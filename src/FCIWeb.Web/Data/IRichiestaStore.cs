@@ -15,7 +15,7 @@ namespace FCIWeb.Web.Data
         Richiesta Add(Richiesta richiesta);
 
         /// <summary>Cambia stato rispettando le transizioni ammesse.</summary>
-        bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage);
+        bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage, Guid? expectedVersion = null);
 
         bool Delete(Guid id);
     }

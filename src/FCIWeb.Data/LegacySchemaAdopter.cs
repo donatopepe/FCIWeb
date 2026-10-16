@@ -50,6 +50,15 @@ namespace FCIWeb.Data
                     throw new InvalidOperationException("Database SQLite pre-migrations has incompatible Richieste schema; missing columns: " + String.Join(", ", missing));
                 reader.Close();
 
+                // Older EnsureCreated databases predate the concurrency token. Add a stable initial
+                // token for all existing records before stamping the initial migration.
+                if (!columns.Contains("Version"))
+                {
+                    using var addVersion = connection.CreateCommand();
+                    addVersion.CommandText = "ALTER TABLE \"Richieste\" ADD COLUMN \"Version\" TEXT NOT NULL DEFAULT '00000000-0000-0000-0000-000000000001'";
+                    addVersion.ExecuteNonQuery();
+                }
+
                 using var transaction = connection.BeginTransaction();
                 if (!hasHistory)
                 {

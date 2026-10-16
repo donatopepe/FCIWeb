@@ -88,6 +88,30 @@ namespace FCIWeb.Data.Tests
         }
 
         [Fact]
+        public void ChangeState_StaleContextReturnsConcurrencyConflict()
+        {
+            var entity = New("A-106", "Concurrent change", StatoRichiesta.Bozza);
+            using (var seed = _fixture.CreateContext()) new EfRichiestaRepository(seed).Add(entity);
+
+            using var contextA = _fixture.CreateContext();
+            using var contextB = _fixture.CreateContext();
+            var repoA = new EfRichiestaRepository(contextA);
+            var repoB = new EfRichiestaRepository(contextB);
+            var staleVersion = repoB.GetById(entity.Id).Version;
+
+            Assert.True(repoA.TryChangeState(entity.Id, StatoRichiesta.Inviata, "first", out var firstError));
+            Assert.Null(firstError);
+            Assert.False(repoB.TryChangeState(entity.Id, StatoRichiesta.Annullata, "stale", out var conflict, staleVersion));
+            Assert.Contains("modificata da un'altra operazione", conflict);
+
+            using var read = _fixture.CreateContext();
+            var unchanged = new EfRichiestaRepository(read).GetById(entity.Id);
+            Assert.Equal(StatoRichiesta.Inviata, unchanged.Stato);
+            Assert.Contains("first", unchanged.Note);
+            Assert.DoesNotContain("stale", unchanged.Note ?? "");
+        }
+
+        [Fact]
         public void ChangeState_UnknownIdReturnsFalse()
         {
             using var db = _fixture.CreateContext();

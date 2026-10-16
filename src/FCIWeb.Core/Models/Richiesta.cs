@@ -26,6 +26,9 @@ namespace FCIWeb.Core.Models
         public StatoRichiesta Stato { get; set; }
         public string Note { get; set; }
 
+        /// <summary>Token application-managed per optimistic concurrency (SQLite e SQL Server).</summary>
+        public Guid Version { get; set; } = Guid.NewGuid();
+
         public static IReadOnlyList<StatoRichiesta> TransizioniAmmesse(StatoRichiesta stato)
         {
             switch (stato)

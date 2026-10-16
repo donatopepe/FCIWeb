@@ -46,6 +46,10 @@ namespace FCIWeb.Data.Migrations
                     b.Property<int>("Stato")
                         .HasColumnType("INTEGER");
 
+                    b.Property<Guid>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("UOCode")
                         .HasMaxLength(32)
                         .HasColumnType("TEXT");

@@ -56,11 +56,17 @@ namespace FCIWeb.Data.Tests
                 Id = Guid.NewGuid(), NDG = "LEGACY-1", Intestazione = "Existing demo data",
                 DataCreazione = DateTime.UtcNow, Stato = StatoRichiesta.Bozza
             };
-            using (var legacy = new FCIWebContext(options))
+            // Simulate the exact pre-migrations schema (without Version or migration history).
+            using (var command = connection.CreateCommand())
             {
-                legacy.Database.EnsureCreated();
-                legacy.Richieste.Add(row);
-                legacy.SaveChanges();
+                command.CommandText = "CREATE TABLE Richieste (Id TEXT NOT NULL PRIMARY KEY, NDG TEXT NOT NULL, Intestazione TEXT NOT NULL, UOCode TEXT NULL, Matricola TEXT NULL, DataCreazione TEXT NOT NULL, Stato INTEGER NOT NULL, Note TEXT NULL)";
+                command.ExecuteNonQuery();
+                command.CommandText = "INSERT INTO Richieste (Id, NDG, Intestazione, UOCode, Matricola, DataCreazione, Stato, Note) VALUES ($id, $ndg, $title, NULL, NULL, $date, 0, NULL)";
+                command.Parameters.AddWithValue("$id", row.Id.ToString());
+                command.Parameters.AddWithValue("$ndg", row.NDG);
+                command.Parameters.AddWithValue("$title", row.Intestazione);
+                command.Parameters.AddWithValue("$date", row.DataCreazione.ToString("O", System.Globalization.CultureInfo.InvariantCulture));
+                command.ExecuteNonQuery();
             }
 
             using (var upgraded = new FCIWebContext(options))

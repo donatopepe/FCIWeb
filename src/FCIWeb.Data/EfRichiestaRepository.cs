@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FCIWeb.Data
 {
-    /// <summary>Repository EF Core con persistenza e transizioni di stato validate.</summary>
+    /// <summary>Repository EF Core con persistenza e transizioni atomiche e validate.</summary>
     public sealed class EfRichiestaRepository : IRichiestaRepository
     {
         private readonly FCIWebContext _db;
@@ -34,6 +34,7 @@ namespace FCIWeb.Data
         {
             ArgumentNullException.ThrowIfNull(richiesta);
             if (richiesta.Id == Guid.Empty) richiesta.Id = Guid.NewGuid();
+            if (richiesta.Version == Guid.Empty) richiesta.Version = Guid.NewGuid();
             if (richiesta.DataCreazione == default) richiesta.DataCreazione = DateTime.UtcNow;
             if (String.IsNullOrWhiteSpace(richiesta.NDG)) throw new ArgumentException("NDG obbligatorio.", nameof(richiesta));
             if (String.IsNullOrWhiteSpace(richiesta.Intestazione)) throw new ArgumentException("Intestazione obbligatoria.", nameof(richiesta));
@@ -43,10 +44,10 @@ namespace FCIWeb.Data
             return richiesta;
         }
 
-        public bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage)
+        public bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage, Guid? expectedVersion = null)
         {
             errorMessage = null;
-            var richiesta = _db.Richieste.SingleOrDefault(r => r.Id == id);
+            var richiesta = _db.Richieste.AsNoTracking().SingleOrDefault(r => r.Id == id);
             if (richiesta == null)
             {
                 errorMessage = "Richiesta non trovata.";
@@ -58,11 +59,26 @@ namespace FCIWeb.Data
                 return false;
             }
 
-            richiesta.Stato = nuovo;
-            if (!String.IsNullOrWhiteSpace(motivazione))
-                richiesta.Note = String.IsNullOrWhiteSpace(richiesta.Note) ? motivazione : richiesta.Note + " | " + motivazione;
+            var oldVersion = expectedVersion ?? richiesta.Version;
+            var newVersion = Guid.NewGuid();
+            var newNote = String.IsNullOrWhiteSpace(motivazione)
+                ? richiesta.Note
+                : String.IsNullOrWhiteSpace(richiesta.Note) ? motivazione : richiesta.Note + " | " + motivazione;
 
-            _db.SaveChanges();
+            // Atomic compare-and-swap: state validation and version predicate prevent lost updates
+            // even when another request changes the row after our read.
+            var updated = _db.Richieste
+                .Where(r => r.Id == id && r.Version == oldVersion)
+                .ExecuteUpdate(setters => setters
+                    .SetProperty(r => r.Stato, nuovo)
+                    .SetProperty(r => r.Version, newVersion)
+                    .SetProperty(r => r.Note, newNote));
+
+            if (updated == 0)
+            {
+                errorMessage = "La richiesta è stata modificata da un'altra operazione. Ricaricare i dati e riprovare.";
+                return false;
+            }
             return true;
         }
 

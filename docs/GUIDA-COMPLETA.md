@@ -47,7 +47,7 @@ Sovrascrivibili con la sezione di configurazione `Demo:Users` o variabili d'ambi
 Test:
 
 ```bash
-dotnet test FCIWeb.CrossPlatform.sln -c Release      # 116 test
+dotnet test FCIWeb.CrossPlatform.sln -c Release      # 117 test
 ```
 
 Le sezioni seguenti (1–11) descrivono invece il **legacy .NET Framework/IIS**, utile per capire il

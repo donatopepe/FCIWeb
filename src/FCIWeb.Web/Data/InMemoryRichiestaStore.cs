@@ -64,7 +64,7 @@ namespace FCIWeb.Web.Data
             return richiesta;
         }
 
-        public bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage)
+        public bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage, Guid? expectedVersion = null)
         {
             errorMessage = null;
             if (!_items.TryGetValue(id, out var r))
@@ -73,6 +73,11 @@ namespace FCIWeb.Web.Data
                 return false;
             }
 
+            if (expectedVersion.HasValue && expectedVersion.Value != r.Version)
+            {
+                errorMessage = "La richiesta è stata modificata da un'altra operazione. Ricaricare i dati e riprovare.";
+                return false;
+            }
             if (!r.PuoCambiareIn(nuovo))
             {
                 errorMessage = $"Transizione non ammessa: {r.Stato} -> {nuovo}.";
@@ -80,6 +85,7 @@ namespace FCIWeb.Web.Data
             }
 
             r.Stato = nuovo;
+            r.Version = Guid.NewGuid();
             if (!String.IsNullOrWhiteSpace(motivazione))
             {
                 r.Note = String.IsNullOrWhiteSpace(r.Note) ? motivazione : r.Note + " | " + motivazione;

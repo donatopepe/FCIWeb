@@ -10,7 +10,7 @@ namespace FCIWeb.Data
         IReadOnlyList<Richiesta> GetAll(string query = null);
         Richiesta GetById(Guid id);
         Richiesta Add(Richiesta richiesta);
-        bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage);
+        bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage, Guid? expectedVersion = null);
         bool Delete(Guid id);
     }
 }

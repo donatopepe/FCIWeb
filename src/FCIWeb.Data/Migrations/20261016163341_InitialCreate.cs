@@ -22,7 +22,8 @@ namespace FCIWeb.Data.Migrations
                     Matricola = table.Column<string>(type: "TEXT", maxLength: 32, nullable: true),
                     DataCreazione = table.Column<DateTime>(type: "TEXT", nullable: false),
                     Stato = table.Column<int>(type: "INTEGER", nullable: false),
-                    Note = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true)
+                    Note = table.Column<string>(type: "TEXT", maxLength: 4000, nullable: true),
+                    Version = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {

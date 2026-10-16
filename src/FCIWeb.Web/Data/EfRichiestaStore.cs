@@ -45,11 +45,12 @@ namespace FCIWeb.Web.Data
                 Matricola = r.Matricola,
                 DataCreazione = r.DataCreazione,
                 Stato = r.Stato,
-                Note = r.Note
+                Note = r.Note,
+                Version = r.Version
             };
 
-        public bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage)
-            => _repository.TryChangeState(id, nuovo, motivazione, out errorMessage);
+        public bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage, Guid? expectedVersion = null)
+            => _repository.TryChangeState(id, nuovo, motivazione, out errorMessage, expectedVersion);
 
         public bool Delete(Guid id) => _repository.Delete(id);
 
@@ -63,7 +64,8 @@ namespace FCIWeb.Web.Data
                 Matricola = r.Matricola,
                 DataCreazione = r.DataCreazione,
                 Stato = r.Stato,
-                Note = r.Note
+                Note = r.Note,
+                Version = r.Version
             };
     }
 }

@@ -25,6 +25,7 @@ namespace FCIWeb.Data
             richiesta.Property(x => x.Note).HasMaxLength(4000);
             richiesta.Property(x => x.Stato).HasConversion<int>().IsRequired();
             richiesta.Property(x => x.DataCreazione).IsRequired();
+            richiesta.Property(x => x.Version).IsConcurrencyToken().IsRequired();
             richiesta.HasIndex(x => x.NDG);
             richiesta.HasIndex(x => x.DataCreazione);
             richiesta.HasIndex(x => x.Stato);

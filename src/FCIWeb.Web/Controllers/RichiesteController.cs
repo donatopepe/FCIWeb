@@ -57,9 +57,9 @@ namespace FCIWeb.Web.Controllers
         }
 
         [HttpPost]
-        public IActionResult CambiaStato(Guid id, StatoRichiesta nuovo, string motivazione)
+        public IActionResult CambiaStato(Guid id, StatoRichiesta nuovo, string motivazione, Guid version)
         {
-            if (!_store.TryChangeState(id, nuovo, motivazione, out var error))
+            if (!_store.TryChangeState(id, nuovo, motivazione, out var error, version))
             {
                 TempData["Errore"] = error;
             }
