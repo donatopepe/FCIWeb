@@ -164,7 +164,12 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 
 ## 11. Stato pubblicazione
 
+- **Pubblicato**: repository **pubblico** su <https://github.com/donatopepe/FCIWeb> (branch `master`,
+  commit iniziale `968cc0c`), creato ex novo per eliminare gli oggetti orfani con segreti.
+- **Verificato pulito su clone fresco**: 0 occorrenze di segreti noti nella history, 0 binari
+  tracciati, working tree senza credenziali, documentazione presente.
 - **Pronto**: codice sorgente originale senza segreti né dipendenze non ridistribuibili; licenza MIT;
   documentazione completa; build/test cross-platform verdi.
-- **Manca**: push su remoto (repo `donatopepe/FCIWeb` attualmente 404); rotazione credenziali da parte
-  dell'owner; completamento porting per l'avvio demo; rimozione `old/` (fase F7).
+- **Manca**: completamento del porting per l'avvio demo (M4); rotazione credenziali da parte
+  dell'owner (la history è pulita, ma i valori sono stati esposti in passato).
+- Backup locali (fuori dal repo): `/root/fciweb-backup-20261016/`, `/root/fciweb-remote-backup.git`.

@@ -32,10 +32,22 @@ Questo repository è pensato per essere **pubblico** e non deve contenere segret
 
 Le credenziali presenti nella history del repository **devono essere considerate compromesse**:
 
-1. **Ruotare** tutte le credenziali coinvolte (SQL Server, wrapper `***REMOVED***`, SMTP).
-2. **Riscrivere la history** prima di pubblicare (`git filter-repo` o BFG Repo-Cleaner) per rimuovere
-   i segreti da tutti i commit, con backup preventivo e conferma dell'owner.
+1. **Ruotare** tutte le credenziali coinvolte (SQL Server, wrapper `Prod`/`Svi`, SMTP).
+2. **Riscrivere la history** (`git filter-repo` o BFG) per rimuovere i segreti da tutti i commit.
 3. Invalidare eventuali token/chiavi esposti.
+
+## Stato attuale della history (2026-10-16)
+
+- History riscritta con `git filter-repo` (2 passate) e **verificata**: 0 occorrenze dei segreti noti
+  su tutti i commit.
+- Il repository GitHub è stato **cancellato e ricreato** per eliminare gli oggetti orfani con segreti.
+- Gate disponibili:
+  - `bash scripts/check-secrets.sh` → working tree
+  - `bash scripts/check-history-secrets.sh` → storia git, tramite deny-list locale non versionata
+    (`.secrets-denylist`, escluso da `.gitignore`; oppure `FCIWEB_DENYLIST=/path/file`).
+- La deny-list **non è versionata di proposito**: elencare i valori li ripubblicherebbe.
+- Backup locali (fuori dal repo): `/root/fciweb-backup-20261016/`, `/root/fciweb-secrets-backup/`,
+  `/root/fciweb-remote-backup.git`.
 
 ### Comando di verifica (working tree)
 
