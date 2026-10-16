@@ -37,7 +37,7 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 10**: **16/16 = 1.00** per i criteri della rubrica. La copertura funzionale
+**Misurato al ciclo 11**: **16/16 = 1.00** per i criteri della rubrica. La copertura funzionale
 rimane in evoluzione: migrations SQLite sono testate; SQL Server end-to-end non è ancora verificato.
 
 ## 3. Fatti verificati
@@ -150,6 +150,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 8 | 2026-10-16 | M3: EF Core SQLite/SQL Server provider, test persistenza, wiring web, volume Docker | ✅* | 113 test passati; build /warnaserror 0/0; Compose up, login 200, DB sul volume |
 | 9 | 2026-10-16 | M3: migrazioni EF versionate, design-time factory, adozione schema EnsureCreated senza perdita | ✅* | suite 116/116; build /warnaserror 0/0; Compose login 200 |
 | 10 | 2026-10-16 | M5 partial: token versione + compare-and-swap transizioni; stale-write tests repository/HTTP | ✅* | suite 118/118; build /warnaserror 0/0 |
+| 11 | 2026-10-16 | Test HTTP stale token con SQLite persistente e richiesta nuova | ✅* | suite 118/118; build /warnaserror 0/0; nessun push |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -278,6 +279,14 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Verifica Linux ciclo 9: Core 96 + Data 10 + Web 10 = **116/116**; build `/warnaserror` 0 warning/errori.
 - Compose smoke: login 200, DB creato, startup completato.
 - Limite: migration SQL Server non testata senza istanza temporanea autorizzata.
+
+### Dettaglio ciclo 11 (M5 partial — verifica web stale token)
+
+- Test HTTP usa SQLite persistente temporaneo e crea una richiesta nuova (non seed in-memory).
+- Legge token versione da Details, invia transizione valida e reinvia token stale per altra transizione.
+- Verifica che stato e motivazione della prima operazione restino invariati dopo seconda POST.
+- Suite: 96 Core + 11 Data + 11 Web = 118/118; build `/warnaserror` 0/0.
+- Nessun push, working tree da commit locale pulito dopo gate.
 
 ### Dettaglio ciclo 10 (M5 partial — concorrenza)
 

@@ -78,7 +78,6 @@ namespace FCIWeb.Web.Tests
         {
             using var client = TestClient.Create(_factory);
             await TestClient.LoginAsync(client, "user", "User123!");
-            var list = await client.GetAsync("/Richieste");
             var formPage = await client.GetAsync("/Richieste/Create");
             var formHtml = await formPage.Content.ReadAsStringAsync();
             var tokenMatch = System.Text.RegularExpressions.Regex.Match(formHtml, "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"");
@@ -92,7 +91,8 @@ namespace FCIWeb.Web.Tests
             var createResponse = await client.PostAsync("/Richieste/Create", createForm);
             Assert.Equal(System.Net.HttpStatusCode.Redirect, createResponse.StatusCode);
             var createdUri = createResponse.Headers.Location.ToString();
-            var id = Guid.Parse(createdUri.AsSpan(createdUri.LastIndexOf('/') + 1));
+            var idSegment = createdUri.Substring(createdUri.LastIndexOf('/') + 1);
+            var id = Guid.Parse(idSegment);
 
             var details = await client.GetAsync(createdUri);
             var detailHtml = await details.Content.ReadAsStringAsync();

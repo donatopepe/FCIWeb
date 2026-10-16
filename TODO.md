@@ -22,14 +22,15 @@ Tasso casi migration superati = passati/totali; soglia **100%** sui test SQLite;
 - [x] Adottare database pregresso `EnsureCreated` senza perdita record: verifica colonne e registra migration iniziale; test dedicato.
 - [x] Fixture SQLite usa migrazioni; test migrazione idempotente/data retention.
 - [x] Build Docker include progetto Data.
-- [x] Suite Linux: Core 96, Data 11, Web 11 = 118 test.
+- [x] Suite Linux (ciclo 10): Core 96, Data 11, Web 11 = 118 test.
 - [x] Build Release `/warnaserror`: zero warning/errori (con restore precedentemente eseguito).
 
 ## M5 partial — concorrenza applicativa completata su SQLite
 - [x] Version token GUID application-managed in entity e migration.
 - [x] Compare-and-swap transizione su ID + expected version.
 - [x] Test two-context stale write rifiutato e dati aggiornati preservati.
-- [x] Test HTTP end-to-end invia due volte lo stesso version token; secondo cambio non sovrascrive il primo.
+- [x] Test HTTP end-to-end (ciclo 10) invia due volte lo stesso version token; secondo cambio non sovrascrive il primo.
+- [x] Test HTTP end-to-end (ciclo 11) crea richiesta nuova e verifica transition stale token non sovrascrive aggiornamento.
 - [ ] Ripetere test su SQL Server reale/disposable autorizzato.
 
 ## Prossimi task aperti
