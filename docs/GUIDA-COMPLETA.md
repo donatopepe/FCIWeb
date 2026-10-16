@@ -38,7 +38,8 @@ docker compose up --build                  # http://localhost:8080
 ```
 
 Credenziali demo (solo locali): `admin / Admin123!` — `user / User123!`.
-Database SQLite persistente: `data/fciweb.db`; in Docker Compose è montato nel volume `fciweb-data`.
+Database SQLite persistente: `data/fciweb.db`; schema creato/aggiornato con migrazioni EF Core all'avvio.
+In Docker Compose è montato nel volume `fciweb-data`.
 Per usare lo store volatile in memoria, impostare `FCIWEB_STORE=memory`.
 Sovrascrivibili con la sezione di configurazione `Demo:Users` o variabili d'ambiente
 (`Demo__Users__0__Username`, `Demo__Users__0__Password`, `Demo__Users__0__Roles`).
@@ -46,7 +47,7 @@ Sovrascrivibili con la sezione di configurazione `Demo:Users` o variabili d'ambi
 Test:
 
 ```bash
-dotnet test FCIWeb.CrossPlatform.sln -c Release      # 112 test
+dotnet test FCIWeb.CrossPlatform.sln -c Release      # 116 test
 ```
 
 Le sezioni seguenti (1–11) descrivono invece il **legacy .NET Framework/IIS**, utile per capire il

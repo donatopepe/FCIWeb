@@ -12,6 +12,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FCIWeb.Core\FCIWeb.Core.csproj" />
     <ProjectReference Include="..\FCIWeb.Data\FCIWeb.Data.csproj" />
   </ItemGroup>

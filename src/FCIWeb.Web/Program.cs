@@ -62,7 +62,8 @@ if (!String.Equals(storeMode, "memory", StringComparison.OrdinalIgnoreCase))
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<FCIWebContext>();
-    db.Database.EnsureCreated();
+    LegacySchemaAdopter.AdoptIfNeeded(db);
+    db.Database.Migrate();
 }
 
 app.UseSecurityHeaders();

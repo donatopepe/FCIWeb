@@ -118,10 +118,9 @@ CRITERI RUBRICA: <n/12>
 Progetto FCIWeb (/home/public/FCIWeb), porting cross-platform .NET 8. Prima leggi PLAN.md,
 TODO.md, docs/PORTING-CROSS-PLATFORM.md, docs/ANALISI-CODICE.md e questo prompt; aggiorna CodeGraph
 (`codegraph sync .`) se stale. Esegui UN ciclo: primo item aperto PLAN §9/TODO; implementa un solo
-cambiamento in src/tests; verifica su Linux con `docker run --rm -v /home/public/FCIWeb:/src -w
+cambiamento in src/tests; verifica Linux con `docker run --rm -v /home/public/FCIWeb:/src -w
 /src mcr.microsoft.com/dotnet/sdk:8.0 bash -lc 'dotnet test FCIWeb.CrossPlatform.sln -c Release'`,
-build `/warnaserror`, e se tocca hosting, Docker smoke. Aggiorna PLAN §2, §6, §10, TODO e docs solo
-con evidenze osservate. Gate: `bash scripts/check-secrets.sh`, history gate, zero binari proprietari;
-nessun push; azioni distruttive solo con autorizzazione. Commit solo con gate verdi. Se bloccato,
-formula domanda precisa.
+build `/warnaserror`, e Docker smoke se hosting/DB cambia. Aggiorna PLAN §2, §6, §10, TODO e docs
+solo con evidenze. Gate: secret/history checks, zero binari proprietari, nessun push, nessuna azione
+distruttiva senza owner. Commit solo con gate verdi. Se bloccato, formula domanda precisa.
 ```

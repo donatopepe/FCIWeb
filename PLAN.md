@@ -31,15 +31,14 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 9 | `PLAN.md` | ✅ | questo file |
 | 10 | `docs/PROMPT-INGEGNERIZZATO.md` | ✅ | file |
 | 11 | CI verde: validazione statica | ✅ | run GitHub `38876403094` job "Validazione statica" → success |
-| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 113/113; build /warnaserror 0/0; workflow GitHub non ancora eseguito sul commit corrente |
+| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 116/116; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
 | 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 8**: **16/16 = 1.00** per i criteri della rubrica. La copertura funzionale
-rimane in evoluzione: il backend M3 è integrato, ma le migrazioni versionate e SQL Server end-to-end
-non sono ancora verificate.
+**Misurato al ciclo 9**: **16/16 = 1.00** per i criteri della rubrica. La copertura funzionale
+rimane in evoluzione: migrations SQLite sono testate; SQL Server end-to-end non è ancora verificato.
 
 ## 3. Fatti verificati
 
@@ -89,7 +88,7 @@ non sono ancora verificate.
 | F5 | Test logica pura | `tests/FCIWeb.Core.Tests` (26 test) | ✅ |
 | F6 | Porting utility pure | `src/FCIWeb.Core/Utility` | ✅ |
 | M2 | Porting modelli di dominio (senza `System.Web`/`System.Drawing`) | `src/FCIWeb.Core/Models` + `Services/IResourcesLookup` | ✅ |
-| M3 | EF Core repository; SQLite demo + provider SQL Server | `src/FCIWeb.Data` | ✅* (schema EnsureCreated; migrations non fatte) |
+| M3 | EF Core repository; SQLite demo + migrations; provider SQL Server compilato | `src/FCIWeb.Data/Migrations` | ✅* (SQLite testato; SQL Server runtime non verificato) |
 | M4 | Web app ASP.NET Core + `DEMO_MODE` avviabile | `src/FCIWeb.Web` + Dockerfile | ✅ |
 | M5 | Repository/servizi + adapter servizi esterni | `src/FCIWeb.Data`, `src/FCIWeb.Web/Data` | 🔶 (repository EF + adapter web; servizi esterni non portati) |
 | M6 | Viste Razor runtime + UI | `src/FCIWeb.Web/Views` | ⏳ |
@@ -149,6 +148,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 6 | 2026-10-16 | M2: porting entità di dominio a POCO + `IResourcesLookup`/`ResourcesDisplay` | ✅ | `dotnet build /warnaserror` OK; `dotnet test` → 42/42 |
 | 7 | 2026-10-16 | Cybersecurity + M4: web app ASP.NET Core avviabile e usabile in DEMO_MODE | ✅ | container Linux: login/elenco/create/ricerca OK; 105 test; header di sicurezza |
 | 8 | 2026-10-16 | M3: EF Core SQLite/SQL Server provider, test persistenza, wiring web, volume Docker | ✅* | 113 test passati; build /warnaserror 0/0; Compose up, login 200, DB sul volume |
+| 9 | 2026-10-16 | M3: migrazioni EF versionate, design-time factory, adozione schema EnsureCreated senza perdita | ✅* | suite 116/116; build /warnaserror 0/0; Compose login 200 |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -247,8 +247,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
   Web 10/10 = **113/113**; `dotnet build ... /warnaserror` → **0 warning, 0 errori**.
 - Docker `build` da context ridotto → OK; `docker compose up -d --build` → login 200, DB creato sul
   volume, UID `app` non-root. `docker compose down` eseguito; dati nel volume persistono.
-- **Limiti**: SQL Server provider solo compilato, non testato con un'istanza DB in questo ciclo;
-  schema usa `EnsureCreated`, non migrazioni versionate (`dotnet ef migrations` rimane backlog).
+- SQL Server provider compilato ma non testato con server; migrazioni EF aggiunte nel ciclo 9.
 
 ### Dettaglio ciclo 8 (M3 — persistenza)
 
@@ -264,8 +263,20 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - **Build** Release `/warnaserror`: **0 warning, 0 errori**.
 - **Docker/Compose**: build OK; `compose up` → login 200, UID `app`, DB presente sul volume; down OK.
 - Gate segreti tree/history e XML OK; zero binari proprietari tracciati. Nessun push.
-- **Limiti**: schema via `EnsureCreated` (migrazioni EF versionate non implementate); provider
-  SQL Server compilato, ma non integrato/testato con un server in questo ciclo.
+- **Limiti al ciclo 8**: prima del ciclo 9 schema usava `EnsureCreated`; provider SQL Server non testato.
+
+### Dettaglio ciclo 9 (M3 — migrazioni)
+
+- Tool locale `dotnet-ef` 8.0.11 (`.config/dotnet-tools.json`) e `FCIWebContextFactory` design-time;
+  SQL Server richiede `FCIWEB_SQLSERVER_CONNECTION` via environment, nessun segreto committato.
+- Generata migration `src/FCIWeb.Data/Migrations/*_InitialCreate.cs` + model snapshot.
+- Runtime e fixture SQLite passati a `Database.Migrate()`.
+- `LegacySchemaAdopter` riconosce database SQLite preesistenti con tabella `Richieste` e history assente/vuota;
+  controlla colonne e registra migration iniziale senza drop/recreate. Test specifico verifica record preservato.
+- `MigrationTests`: DB vuoto, migration idempotente, upgrade da `EnsureCreated`, schema incompatibile rifiutato.
+- Verifica Linux: Core 96 + Data 10 + Web 10 = **116/116**; build `/warnaserror` 0 warning/errori.
+- Compose smoke: login 200, DB creato, startup completato.
+- Limite: migration SQL Server non testata senza istanza temporanea autorizzata.
 
 ## 11. Stato pubblicazione
 

@@ -17,7 +17,7 @@ namespace FCIWeb.Data.Tests
             _connection.Open();
             Options = new DbContextOptionsBuilder<FCIWebContext>().UseSqlite(_connection).Options;
             using var db = new FCIWebContext(Options);
-            db.Database.EnsureCreated();
+            db.Database.Migrate();
         }
 
         public FCIWebContext CreateContext() => new FCIWebContext(Options);
