@@ -88,7 +88,7 @@ M2–M8 (attualmente M0/M1 fatte).
 | F4 | CI: validazione statica + cross-platform | `.github/workflows/ci.yml`, `scripts/*` | 🔄 |
 | F5 | Test logica pura | `tests/FCIWeb.Core.Tests` (26 test) | ✅ |
 | F6 | Porting utility pure | `src/FCIWeb.Core/Utility` | ✅ |
-| M2 | Porting modelli di dominio (senza `System.Web`/`System.Drawing`) | `src/FCIWeb.Core/Models` | ⏳ |
+| M2 | Porting modelli di dominio (senza `System.Web`/`System.Drawing`) | `src/FCIWeb.Core/Models` + `Services/IResourcesLookup` | ✅ |
 | M3 | EF Core + migrazioni + provider SQLite/SQL Server | `src/FCIWeb.Data` | ⏳ |
 | M4 | Web app ASP.NET Core + `DEMO_MODE` | `src/FCIWeb.Web` | ⏳ |
 | M5 | Repository/servizi + adapter servizi esterni | `src/FCIWeb.App` | ⏳ |
@@ -146,6 +146,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 3 | 2026-10-16 | Avvio cross-platform: soluzione .NET 8, utility portate, 26 test, CI, doc porting | ✅ | `dotnet test` → 26/26 in Docker Linux |
 | 4 | 2026-10-16 | Pubblicazione repo pubblico pulito + CI verde | ✅ | [run 38876403094](https://github.com/donatopepe/FCIWeb/actions/runs/38876403094): validate ✅, crossplatform ✅, legacy ⚠️ |
 | 5 | 2026-10-16 | De-branding completo: nessun riferimento all'azienda (testi, acronimi, loghi, URL) in tree e history | ✅ | clone fresco: 0 hit; `logo.svg` generico; gate storia OK |
+| 6 | 2026-10-16 | M2: porting entità di dominio a POCO + `IResourcesLookup`/`ResourcesDisplay` | ✅ | `dotnet build /warnaserror` OK; `dotnet test` → 42/42 |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -178,12 +179,11 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 
 ### Dettaglio ciclo 5 (de-branding)
 
-- Rimossi **loghi dell'istituto** (`logo.gif/.jpg`) da working tree e history; aggiunto
-  `Source/Content/img/logo.svg` generico "FCIWeb".
-- `AssemblyInfo.cs`: company/copyright → `Example Organization`.
+- Rimossi i **loghi dell'istituto** da working tree e history; aggiunto `Source/Content/img/logo.svg`
+  generico "FCIWeb".
 - Neutralizzati: URL/domini interni, SSO, help desk, IP `172.28.166.x`, portali.
-- Rinominati identificatori con acronimo aziendale: `DescrizioneUO`→`DescrizioneUO`,
-  `WSProfiles`→`WSProfiles`, `wsProfiles`→`wsProfiles`.
+- Rinominati con nomi neutri gli identificatori che contenevano l'acronimo aziendale
+  (proprietà/tipi dei proxy proprietari, variabili locali).
 - Genericizzati testi di reparto e prefissi di build/storage; dati simulati (filiali) e view.
 - History riscritta con `git-filter-repo --replace-text` (+ regex per stringhe spezzate dal
   code-gen) e `--invert-paths` sui loghi; repository GitHub **cancellato e ricreato** per eliminare
@@ -193,6 +193,19 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Limite dichiarato: termini italiani generici di dominio ("data stop banca", "giorni attesa
   banca") restano perché indicano il processo, non l'istituto (rinominarli cambierebbe chiavi di
   configurazione e campi DB).
+
+### Dettaglio ciclo 6 (M2 — modelli di dominio)
+
+- Portate in `src/FCIWeb.Core/Models` le entità: `ParametriApp`, `Comune` (+ interfaccia `IAuditInfo`),
+  `Profili`, `ProfiliWL`, `StatiPossibili`, `Stati`, `LogStati`, `column`, `Colonne`, `Fogli`, `Righe`,
+  `EmailTesti`, `EmailSettings`, `EmailTipo`, `LogEmail`.
+- Rimosse le dipendenze non portabili dai modelli: `System.Web.Mvc` (`HiddenInput`), `System.Drawing`,
+  `Elmah`, `AreaCommonWeb`/`DAL.AreaCommonWeb`.
+- Estratta l'astrazione `IResourcesLookup` (utenti/UO) + `ResourcesDisplay` per i nomi leggibili,
+  con fallback al valore grezzo (null-safe, non propaga eccezioni).
+- Nomi delle proprietà mantenuti identici al legacy per non rompere la mappatura EF (M3).
+- `CS8981` (`column`) silenziato in `FCIWeb.Core.csproj` con motivazione.
+- **Verifica**: `dotnet build -c Release /warnaserror` → 0 warning/0 errori; `dotnet test` → **42/42**.
 
 ## 11. Stato pubblicazione
 

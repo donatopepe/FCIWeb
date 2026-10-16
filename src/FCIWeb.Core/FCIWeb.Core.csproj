@@ -8,8 +8,10 @@
     <RootNamespace>FCIWeb.Core</RootNamespace>
     <AssemblyName>FCIWeb.Core</AssemblyName>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <!-- CS1591: commento XML mancante (il codice legacy non ne ha). -->
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
+    <!-- CS1591: commento XML mancante (il codice legacy non ne ha).
+         CS8981: nome di tipo tutto minuscolo ('column') mantenuto per fedeltà alla mappatura EF
+         e alla forma JSON del legacy. -->
+    <NoWarn>$(NoWarn);CS1591;CS8981</NoWarn>
   </PropertyGroup>
 
 </Project>
