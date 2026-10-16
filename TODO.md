@@ -22,7 +22,7 @@ Tasso casi migration superati = passati/totali; soglia **100%** sui test SQLite;
 - [x] Adottare database pregresso `EnsureCreated` senza perdita record: verifica colonne e registra migration iniziale; test dedicato.
 - [x] Fixture SQLite usa migrazioni; test migrazione idempotente/data retention.
 - [x] Build Docker include progetto Data.
-- [x] Suite Linux (ciclo 10): Core 96, Data 11, Web 11 = 118 test.
+- [x] Suite Linux (ciclo 12): Core 96, Data 12, Web 11 = 119 test.
 - [x] Build Release `/warnaserror`: zero warning/errori (con restore precedentemente eseguito).
 
 ## M5 partial — concorrenza applicativa completata su SQLite
