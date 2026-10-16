@@ -1,0 +1,53 @@
+@model Richiesta
+@{
+    ViewData["Title"] = "Richiesta " + Model.NDG;
+    var transizioni = ViewBag.Transizioni as IReadOnlyList<StatoRichiesta> ?? Array.Empty<StatoRichiesta>();
+}
+
+<div class="page-head">
+    <h1>Richiesta @Model.NDG</h1>
+    <a class="linklike" asp-action="Index">&laquo; Elenco</a>
+</div>
+
+<dl class="details">
+    <dt>NDG</dt><dd>@Model.NDG</dd>
+    <dt>Intestazione</dt><dd>@Model.Intestazione</dd>
+    <dt>UO</dt><dd>@Model.UOCode</dd>
+    <dt>Matricola</dt><dd>@Model.Matricola</dd>
+    <dt>Stato</dt><dd><span class="badge badge-@Model.Stato.ToString().ToLowerInvariant()">@Model.Stato</span></dd>
+    <dt>Data creazione</dt><dd>@Model.DataCreazione.ToString("yyyy-MM-dd HH:mm")</dd>
+    <dt>Note</dt><dd>@Model.Note</dd>
+</dl>
+
+@if (transizioni.Count > 0)
+{
+    <section class="panel">
+        <h2>Cambia stato</h2>
+        <form asp-action="CambiaStato" method="post" class="form-inline">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <select name="nuovo">
+                @foreach (var t in transizioni)
+                {
+                    <option value="@((int)t)">@t</option>
+                }
+            </select>
+            <input type="text" name="motivazione" placeholder="Motivazione (opzionale)" maxlength="500" />
+            <button type="submit">Applica</button>
+        </form>
+    </section>
+}
+else
+{
+    <p class="muted">Stato terminale: nessuna ulteriore transizione disponibile.</p>
+}
+
+@if (User.IsInRole("admin"))
+{
+    <section class="panel danger">
+        <h2>Zona amministratore</h2>
+        <form asp-action="Delete" method="post">
+            <input type="hidden" name="id" value="@Model.Id" />
+            <button type="submit" class="danger">Elimina richiesta</button>
+        </form>
+    </section>
+}

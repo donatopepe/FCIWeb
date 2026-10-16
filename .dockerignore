@@ -1,0 +1,17 @@
+# Contesto di build ridotto per l'immagine Docker della web app .NET 8.
+.git
+.github
+old
+Source
+lib
+packages
+BuildProcessTemplates
+docs
+**/bin
+**/obj
+**/TestResults
+.pi-loop.json
+.pi-loop.json.lock
+.secrets-denylist
+*.tar.gz
+*.bundle

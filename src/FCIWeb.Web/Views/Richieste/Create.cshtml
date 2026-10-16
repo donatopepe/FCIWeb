@@ -1,0 +1,33 @@
+@model RichiestaCreateModel
+@{
+    ViewData["Title"] = "Nuova richiesta";
+}
+
+<h1>Nuova richiesta</h1>
+
+<form asp-action="Create" method="post" class="form">
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+    <label asp-for="NDG">NDG</label>
+    <input asp-for="NDG" maxlength="32" />
+    <span asp-validation-for="NDG" class="field-error"></span>
+
+    <label asp-for="Intestazione">Intestazione</label>
+    <input asp-for="Intestazione" maxlength="200" />
+    <span asp-validation-for="Intestazione" class="field-error"></span>
+
+    <label asp-for="UOCode">UO</label>
+    <input asp-for="UOCode" maxlength="32" />
+    <span asp-validation-for="UOCode" class="field-error"></span>
+
+    <label asp-for="Matricola">Matricola</label>
+    <input asp-for="Matricola" maxlength="32" />
+    <span asp-validation-for="Matricola" class="field-error"></span>
+
+    <label asp-for="Note">Note</label>
+    <textarea asp-for="Note" rows="4" maxlength="1000"></textarea>
+    <span asp-validation-for="Note" class="field-error"></span>
+
+    <button type="submit">Crea</button>
+    <a class="linklike" asp-action="Index">Annulla</a>
+</form>

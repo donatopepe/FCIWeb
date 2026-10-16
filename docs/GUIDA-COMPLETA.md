@@ -27,6 +27,30 @@ Riferimenti: [`README.md`](../README.md), [`docs/ANALISI-CODICE.md`](ANALISI-COD
 
 ---
 
+## 0. Avvio rapido cross-platform (consigliato)
+
+Il modo più semplice per **vedere l'app funzionante** (Linux/macOS/Windows, senza database):
+
+```bash
+dotnet run --project src/FCIWeb.Web        # http://localhost:5000
+# oppure
+docker compose up --build                  # http://localhost:8080
+```
+
+Credenziali demo (solo locali): `admin / Admin123!` — `user / User123!`.
+Sovrascrivibili con la sezione di configurazione `Demo:Users` o variabili d'ambiente
+(`Demo__Users__0__Username`, `Demo__Users__0__Password`, `Demo__Users__0__Roles`).
+
+Test:
+
+```bash
+dotnet test FCIWeb.CrossPlatform.sln -c Release      # 105 test
+```
+
+Le sezioni seguenti (1–11) descrivono invece il **legacy .NET Framework/IIS**, utile per capire il
+sistema originale e per un deploy on-premise. Vedi anche
+[`PORTING-CROSS-PLATFORM.md`](PORTING-CROSS-PLATFORM.md).
+
 ## 1. Prerequisiti
 
 ### 1.1 Sistema e runtime

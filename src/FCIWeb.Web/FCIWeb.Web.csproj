@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>FCIWeb.Web</RootNamespace>
+    <AssemblyName>FCIWeb.Web</AssemblyName>
+    <!-- Vista come libreria non richiesta; il progetto resta eseguibile (dotnet run). -->
+    <UserSecretsId>fciweb-web-demo</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FCIWeb.Core\FCIWeb.Core.csproj" />
+  </ItemGroup>
+
+</Project>

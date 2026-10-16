@@ -1,0 +1,26 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Accesso";
+}
+
+<h1>Accesso</h1>
+
+<form asp-action="Login" method="post" class="form">
+    <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+    <label asp-for="Username">Username</label>
+    <input asp-for="Username" autocomplete="username" autofocus />
+    <span asp-validation-for="Username" class="field-error"></span>
+
+    <label asp-for="Password">Password</label>
+    <input asp-for="Password" type="password" autocomplete="current-password" />
+    <span asp-validation-for="Password" class="field-error"></span>
+
+    <button type="submit">Entra</button>
+</form>
+
+<div class="hint">
+    <strong>Credenziali demo</strong> (solo per test locali):
+    <code>admin / Admin123!</code> (ruolo admin) — <code>user / User123!</code> (ruolo user).
+    Sovrascrivibili con la sezione <code>Demo:Users</code>.
+</div>

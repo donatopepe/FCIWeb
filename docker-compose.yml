@@ -1,0 +1,21 @@
+# Avvia FCIWeb.Web (DEMO_MODE) su http://localhost:8080
+# Credenziali demo: admin / Admin123!  (ruolo admin) — user / User123! (ruolo user)
+services:
+  fciweb:
+    build:
+      context: .
+      dockerfile: src/FCIWeb.Web/Dockerfile
+    image: fciweb-web:local
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      # Sovrascrivi le credenziali demo (non usare i default in produzione):
+      # - Demo__Users__0__Username=admin
+      # - Demo__Users__0__Password=cambiami
+      # - Demo__Users__0__Roles=admin
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true

@@ -34,12 +34,12 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | run `38876403094` job "Build + test cross-platform" → success (26 test) |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
-| 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ⏳ | fase M4 |
+| 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | container avviato in 1s; curl: login/elenco/create/ricerca OK; 105 test |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 4**: **15/16 = 0.9375**, sopra la soglia obiettivo (0.92) per i criteri
-"public-ready". La completezza **funzionale** cross-platform è tracciata separatamente dalle fasi
-M2–M8 (attualmente M0/M1 fatte).
+**Misurato al ciclo 7**: **16/16 = 1.00** (soglia obiettivo 0.92 superata).
+La rubrica misura la *pubblicabilità e avviabilità*; la copertura funzionale del dominio legacy
+prosegue nelle fasi M3/M5/M6.
 
 ## 3. Fatti verificati
 
@@ -90,8 +90,8 @@ M2–M8 (attualmente M0/M1 fatte).
 | F6 | Porting utility pure | `src/FCIWeb.Core/Utility` | ✅ |
 | M2 | Porting modelli di dominio (senza `System.Web`/`System.Drawing`) | `src/FCIWeb.Core/Models` + `Services/IResourcesLookup` | ✅ |
 | M3 | EF Core + migrazioni + provider SQLite/SQL Server | `src/FCIWeb.Data` | ⏳ |
-| M4 | Web app ASP.NET Core + `DEMO_MODE` | `src/FCIWeb.Web` | ⏳ |
-| M5 | Repository/servizi + adapter servizi esterni | `src/FCIWeb.App` | ⏳ |
+| M4 | Web app ASP.NET Core + `DEMO_MODE` avviabile | `src/FCIWeb.Web` + Dockerfile | ✅ |
+| M5 | Repository/servizi + adapter servizi esterni | `src/FCIWeb.App` | 🔶 (store in memoria) |
 | M6 | Viste Razor runtime + UI | `src/FCIWeb.Web/Views` | ⏳ |
 | M7 | Documenti: OpenXml al posto di Office Interop | `src/FCIWeb.Documents` | ⏳ |
 | M8 | Docker multi-arch + release | `Dockerfile`, tag | ⏳ |
@@ -147,6 +147,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 4 | 2026-10-16 | Pubblicazione repo pubblico pulito + CI verde | ✅ | [run 38876403094](https://github.com/donatopepe/FCIWeb/actions/runs/38876403094): validate ✅, crossplatform ✅, legacy ⚠️ |
 | 5 | 2026-10-16 | De-branding completo: nessun riferimento all'azienda (testi, acronimi, loghi, URL) in tree e history | ✅ | clone fresco: 0 hit; `logo.svg` generico; gate storia OK |
 | 6 | 2026-10-16 | M2: porting entità di dominio a POCO + `IResourcesLookup`/`ResourcesDisplay` | ✅ | `dotnet build /warnaserror` OK; `dotnet test` → 42/42 |
+| 7 | 2026-10-16 | Cybersecurity + M4: web app ASP.NET Core avviabile e usabile in DEMO_MODE | ✅ | container Linux: login/elenco/create/ricerca OK; 105 test; header di sicurezza |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -206,6 +207,29 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Nomi delle proprietà mantenuti identici al legacy per non rompere la mappatura EF (M3).
 - `CS8981` (`column`) silenziato in `FCIWeb.Core.csproj` con motivazione.
 - **Verifica**: `dotnet build -c Release /warnaserror` → 0 warning/0 errori; `dotnet test` → **42/42**.
+
+### Dettaglio ciclo 7 (cybersecurity + M4)
+
+**Cybersecurity (`src/FCIWeb.Core/Security`)**
+- `SecurityGuards`: content-type null-safe, limite dimensione payload, `SanitizeFileName`
+  (traversal Windows **e** POSIX), `IsSafeRelativePath`/`CombineUnderRoot` (drive/UNC/POSIX).
+- `SecretRedactor`: maschera password, connection string, token/Bearer, chiavi private nei log.
+- `SecureSmtpValidator`: impedisce credenziali SMTP in chiaro su host remoti, porte invalide,
+  credenziali incoerenti.
+- Analizzatori .NET abilitati per `src/` e `tests/` (`AnalysisLevel=latest-recommended`), bloccanti
+  in CI via `/warnaserror`.
+- Header di sicurezza + CSP, antiforgery globale, cookie auth `HttpOnly`/`SameSite`, PBKDF2-SHA256,
+  autorizzazione per ruolo, container non-root, nessun header `Server`, `read_only` in compose.
+
+**Web app avviabile (`src/FCIWeb.Web`, M4)**
+- ASP.NET Core MVC 8 con `DEMO_MODE`: store in memoria con dati demo (nessun DB/servizio).
+- Controller `Home`, `Account` (login/logout), `Richieste` (elenco/ricerca, dettagli, crea,
+  cambio stato con transizioni validate, elimina solo admin).
+- Viste Razor + CSS locale (nessuna CDN, coerente con la CSP `default-src 'self'`).
+- `Dockerfile` multi-stage, `docker-compose.yml`, `.dockerignore`.
+- **Verifica reale**: immagine costruita, container avviato in 1s, curl su login/elenco/create/ricerca;
+  antiforgery mancante → 400; login errato → 200 con errore; ruolo user su delete → accesso negato.
+- **Test**: 96 dominio + 9 integrazione web = **105**, verdi.
 
 ## 11. Stato pubblicazione
 

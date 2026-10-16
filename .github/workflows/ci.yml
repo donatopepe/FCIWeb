@@ -105,6 +105,30 @@ jobs:
           if-no-files-found: warn
 
   # ---------------------------------------------------------------------------
+  # Immagine Docker: garantisce che l'app sia realmente avviabile su Linux.
+  # ---------------------------------------------------------------------------
+  docker:
+    name: Docker build (immagine runtime)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build immagine
+        run: docker build -t fciweb-web:ci -f src/FCIWeb.Web/Dockerfile .
+
+      - name: Avvio container e smoke test
+        run: |
+          set -e
+          docker run -d --name fciweb-ci -p 8080:8080 fciweb-web:ci
+          for i in $(seq 1 30); do
+            sleep 1
+            curl -fsS -o /dev/null http://localhost:8080/Account/Login && break
+          done
+          curl -fsS http://localhost:8080/Account/Login | grep -q "Accesso"
+          curl -fsS -D - -o /dev/null http://localhost:8080/Account/Login | grep -qi "content-security-policy"
+          docker rm -f fciweb-ci
+
+  # ---------------------------------------------------------------------------
   # Build .NET Framework: richiede Windows e le DLL di lib/. Informativa
   # (continue-on-error) finché il percorso non è verificato — vedi PLAN.md F4.
   # ---------------------------------------------------------------------------

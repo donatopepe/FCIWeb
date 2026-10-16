@@ -9,19 +9,44 @@ abilitazione e log delle modifiche.
 > nuovo codice è in `src/`. Vedi [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLATFORM.md)
 > e [`PLAN.md`](PLAN.md).
 
-## Cross-platform (.NET 8)
+## Cross-platform (.NET 8) — app avviabile e usabile
 
-La nuova soluzione **`FCIWeb.CrossPlatform.sln`** compila e testa su Linux, macOS e Windows:
+La soluzione **`FCIWeb.CrossPlatform.sln`** compila, testa ed **esegue** su Linux, macOS e Windows,
+**senza** SQL Server, senza servizi interni e senza dipendenze proprietarie (DEMO_MODE con dati in
+memoria).
 
 ```bash
 # richiede .NET SDK 8+
-dotnet test FCIWeb.CrossPlatform.sln -c Release
+dotnet run --project src/FCIWeb.Web            # http://localhost:5000 (o porta indicata)
 ```
 
-Nessuna dipendenza proprietaria, nessun segreto, nessun Windows/IIS.
-Stato attuale: logica di dominio portata (`src/FCIWeb.Core`), 26 test verdi; la web app ASP.NET Core
-è in fase M4 (`PLAN.md`). Mappa di conversione completa in
-[`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLATFORM.md).
+Oppure con Docker (immagine non-root, porta 8080):
+
+```bash
+docker compose up --build                      # http://localhost:8080
+# oppure
+docker build -t fciweb-web:local -f src/FCIWeb.Web/Dockerfile .
+docker run --rm -p 8080:8080 fciweb-web:local
+```
+
+**Credenziali demo** (solo locali, sovrascrivibili con `Demo:Users`):
+`admin / Admin123!` (ruolo admin) — `user / User123!` (ruolo user).
+
+Cosa puoi fare: autenticarti, sfogliare e cercare le richieste, crearne una, cambiarne lo stato
+(flusso a stati con transizioni validate), eliminarla (solo admin).
+
+Sicurezza già attiva: header di sicurezza + CSP, antiforgery su tutte le POST, password verificate
+con PBKDF2-SHA256, autorizzazione per ruolo, container non-root, nessun header `Server`.
+
+Test:
+
+```bash
+dotnet test FCIWeb.CrossPlatform.sln -c Release   # 105 test (dominio + integrazione web)
+```
+
+Stato: `src/FCIWeb.Core` (dominio + sicurezza) e `src/FCIWeb.Web` (ASP.NET Core MVC) funzionanti in
+demo; restano EF Core (M3) e il porting completo delle viste legacy (M6). Dettagli in
+[`PLAN.md`](PLAN.md) e [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLATFORM.md).
 
 ---
 

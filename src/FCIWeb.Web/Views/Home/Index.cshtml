@@ -1,0 +1,18 @@
+@{
+    ViewData["Title"] = "Home";
+}
+<h1>FCIWeb</h1>
+<p>Applicazione demo avviabile e usabile, portata su .NET 8 ed eseguibile anche su Linux/macOS.</p>
+
+<ul class="cards">
+    <li>
+        <h2>Richieste</h2>
+        <p>Consulta, crea e gestisci le richieste con il flusso a stati.</p>
+        <a class="button" asp-controller="Richieste" asp-action="Index">Apri elenco</a>
+    </li>
+    <li>
+        <h2>Nuova richiesta</h2>
+        <p>Crea una richiesta in stato <em>Bozza</em>.</p>
+        <a class="button" asp-controller="Richieste" asp-action="Create">Crea</a>
+    </li>
+</ul>

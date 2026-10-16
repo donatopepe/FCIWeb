@@ -1,0 +1,21 @@
+using System;
+using System.Collections.Generic;
+using FCIWeb.Web.Models;
+
+namespace FCIWeb.Web.Data
+{
+    /// <summary>Accesso ai dati delle richieste (memoria in DEMO_MODE, EF Core in M3).</summary>
+    public interface IRichiestaStore
+    {
+        IReadOnlyList<Richiesta> GetAll(string query = null);
+
+        Richiesta GetById(Guid id);
+
+        Richiesta Add(Richiesta richiesta);
+
+        /// <summary>Cambia stato rispettando le transizioni ammesse.</summary>
+        bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage);
+
+        bool Delete(Guid id);
+    }
+}

@@ -1,0 +1,48 @@
+@model IReadOnlyList<Richiesta>
+@{
+    ViewData["Title"] = "Richieste";
+}
+
+<div class="page-head">
+    <h1>Richieste</h1>
+    <a class="button" asp-action="Create">Nuova richiesta</a>
+</div>
+
+<form method="get" asp-action="Index" class="filters">
+    <input type="text" name="q" value="@ViewBag.Query" placeholder="Cerca per NDG, intestazione o UO" />
+    <button type="submit">Cerca</button>
+    <a class="linklike" asp-action="Index">Azzera</a>
+</form>
+
+@if (Model.Count == 0)
+{
+    <p class="empty">Nessuna richiesta trovata.</p>
+}
+else
+{
+    <table class="grid">
+        <thead>
+            <tr>
+                <th>NDG</th>
+                <th>Intestazione</th>
+                <th>UO</th>
+                <th>Stato</th>
+                <th>Data</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.NDG</td>
+                    <td>@r.Intestazione</td>
+                    <td>@r.UOCode</td>
+                    <td><span class="badge badge-@r.Stato.ToString().ToLowerInvariant()">@r.Stato</span></td>
+                    <td>@r.DataCreazione.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td><a asp-action="Details" asp-route-id="@r.Id">Dettagli</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

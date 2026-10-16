@@ -59,11 +59,32 @@ grep -rInE "password=|pwd=|user id=|Initial Catalog|Data Source|apikey|api_key|s
 
 L'output deve essere vuoto (o contenere solo placeholder).
 
-## Hardening consigliato (debito noto)
+## Controlli implementati (stack cross-platform .NET 8)
 
-- `JsonModelBinder` legge l'intero body senza limite di dimensione → limitare `maxRequestLength`/
-  `maxJsonLength` e validare l'input.
-- `contentType.Contains(...)` senza null-check in `JsonModelBinder`.
+| Controllo | Dove | Evidenza |
+|-----------|------|----------|
+| Validazione content-type null-safe | `SecurityGuards.IsJsonContentType` | test unitari |
+| Limite dimensione payload | `SecurityGuards.EnsureWithinSize` (1 MiB default) | test unitari |
+| Sanitizzazione nomi file (traversal Windows+POSIX) | `SecurityGuards.SanitizeFileName` | test unitari |
+| Difesa path traversal (drive/UNC/POSIX) | `SecurityGuards.IsSafeRelativePath`/`CombineUnderRoot` | test unitari |
+| Mascheramento segreti nei log | `SecretRedactor` | test unitari |
+| Validazione configurazione SMTP | `SecureSmtpValidator` | test unitari |
+| Header di sicurezza + CSP | `SecurityHeadersExtensions` | test integrazione |
+| Antiforgery su tutte le POST | `AutoValidateAntiforgeryTokenAttribute` | test integrazione (400 senza token) |
+| Password con PBKDF2-SHA256 (100k iterazioni) | `DemoUserStore` | revisione codice |
+| Autorizzazione per ruolo | `RichiesteController.Delete` (`[Authorize(Roles="admin")]`) | verifica empirica (accesso negato) |
+| Cookie `HttpOnly`, `SameSite=Lax`, scadenza | `Program.cs` | revisione codice |
+| Container non-root + `read_only` + `no-new-privileges` | `Dockerfile`, `docker-compose.yml` | build + run |
+| Nessun header `Server` | `Kestrel.AddServerHeader=false` | verifica curl |
+| Analizzatori .NET bloccanti | `src/Directory.Build.props`, CI `/warnaserror` | build 0 warning |
+
+## Hardening consigliato (debito noto, legacy `Source/`)
+
+Questi punti riguardano il progetto legacy .NET Framework e sono **già risolti** nel nuovo stack:
+
+- `JsonModelBinder` legge l'intero body senza limite di dimensione → nel nuovo stack il limite è
+  centralizzato in `SecurityGuards`.
+- `contentType.Contains(...)` senza null-check in `JsonModelBinder` → `IsJsonContentType` è null-safe.
 - `catch { }` silenziosi che possono nascondere errori di sicurezza/dati.
 - ELMAH configurato con `allowedUsers="*"` → restringere in produzione.
 - Autenticazione windows-based: garantire che anonymous sia disabilitata su IIS.

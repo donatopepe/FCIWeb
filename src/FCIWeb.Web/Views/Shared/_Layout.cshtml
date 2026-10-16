@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - FCIWeb</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <a asp-controller="Home" asp-action="Index">FCIWeb</a>
+            <span class="tag">demo cross-platform</span>
+        </div>
+        <nav>
+            @if (User?.Identity != null && User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="Richieste" asp-action="Index">Richieste</a>
+                <a asp-controller="Richieste" asp-action="Create">Nuova</a>
+                <span class="user">@User.Identity.Name</span>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                    <button type="submit" class="linklike">Esci</button>
+                </form>
+            }
+        </nav>
+    </header>
+
+    <main class="container">
+        @if (TempData["Errore"] != null)
+        {
+            <div class="alert alert-error">@TempData["Errore"]</div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="footer">
+        FCIWeb &copy; @DateTime.UtcNow.Year — progetto open source (MIT).
+    </footer>
+</body>
+</html>

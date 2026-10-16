@@ -1,0 +1,17 @@
+<Project>
+
+  <!--
+    Analizzatori .NET abilitati per il codice cross-platform (src/ e tests/).
+    Scopo: rendere bloccanti (in CI, con /warnaserror) i warning degli analyzer,
+    inclusi quelli di sicurezza (CA2xxx/CA3xxx/CA5xxx).
+    NON si applica al progetto legacy Source/ (.NET Framework).
+  -->
+  <PropertyGroup>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <!-- CA1707: underscore nei nomi (compatibilità con i nomi legacy) -->
+    <NoWarn>$(NoWarn);CA1707</NoWarn>
+  </PropertyGroup>
+
+</Project>
