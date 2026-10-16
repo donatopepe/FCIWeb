@@ -403,3 +403,11 @@ Source/Content/kendo/
 Source/Scripts/ce-master.zip
 Source/Scripts/ce-master/ce-master/
 !lib/README.md
+
+# Test/coverage
+TestResults/
+*.trx
+coverage.*
+
+# Deny-list locale dei segreti (NON versionare)
+.secrets-denylist

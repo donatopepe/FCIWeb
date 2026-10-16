@@ -73,6 +73,38 @@ jobs:
           fi
 
   # ---------------------------------------------------------------------------
+  # Build + test cross-platform (.NET 8 su Linux): bloccante.
+  # Copre src/FCIWeb.Core e tests/FCIWeb.Core.Tests.
+  # ---------------------------------------------------------------------------
+  crossplatform:
+    name: Build + test cross-platform (.NET 8)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore FCIWeb.CrossPlatform.sln
+
+      - name: Build
+        run: dotnet build FCIWeb.CrossPlatform.sln -c Release --no-restore /warnaserror
+
+      - name: Test
+        run: dotnet test FCIWeb.CrossPlatform.sln -c Release --no-build --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload risultati test
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: '**/TestResults/*.trx'
+          if-no-files-found: warn
+
+  # ---------------------------------------------------------------------------
   # Build .NET Framework: richiede Windows e le DLL di lib/. Informativa
   # (continue-on-error) finché il percorso non è verificato — vedi PLAN.md F4.
   # ---------------------------------------------------------------------------

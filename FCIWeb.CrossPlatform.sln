@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{ED5BAC10-9651-4DA3-AA8C-4E630D3EF27A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCIWeb.Core", "src\FCIWeb.Core\FCIWeb.Core.csproj", "{C3C7AAC9-B839-4B83-9D1A-5D226171F5F6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{1B3E268D-88A1-4060-A58A-612266FC73B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FCIWeb.Core.Tests", "tests\FCIWeb.Core.Tests\FCIWeb.Core.Tests.csproj", "{F87727F6-853E-4BA2-AC23-39CD82708E66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C3C7AAC9-B839-4B83-9D1A-5D226171F5F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3C7AAC9-B839-4B83-9D1A-5D226171F5F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3C7AAC9-B839-4B83-9D1A-5D226171F5F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3C7AAC9-B839-4B83-9D1A-5D226171F5F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F87727F6-853E-4BA2-AC23-39CD82708E66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F87727F6-853E-4BA2-AC23-39CD82708E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F87727F6-853E-4BA2-AC23-39CD82708E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F87727F6-853E-4BA2-AC23-39CD82708E66}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C3C7AAC9-B839-4B83-9D1A-5D226171F5F6} = {ED5BAC10-9651-4DA3-AA8C-4E630D3EF27A}
+		{F87727F6-853E-4BA2-AC23-39CD82708E66} = {1B3E268D-88A1-4060-A58A-612266FC73B5}
+	EndGlobalSection
+EndGlobal

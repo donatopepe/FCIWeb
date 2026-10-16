@@ -4,10 +4,24 @@ Applicazione **ASP.NET MVC 4 / .NET Framework** per la gestione intranet di *Ric
 strutturati: flusso a stati, allegati, documenti Word/Excel, notifiche email, profili di
 abilitazione e log delle modifiche.
 
-> ⚠️ **Stato del progetto**: applicazione legacy di origine aziendale, pubblicata come codice
-> sorgente a scopo di studio/manutenzione. Richiede **Windows + IIS + SQL Server** e dipendenze di
-> terze parti **non ridistribuibili** (Telerik, Kendo UI, `AreaCommonWeb.dll`, `WebServiceModel.dll`).
-> Vedi [Limiti noti](#limiti-noti) e [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+> ⚠️ **Stato del progetto**: applicazione legacy di origine aziendale, in corso di **porting a .NET 8
+> cross-platform** (Linux/macOS/Windows). Il codice legacy (`Source/`) resta come riferimento; il
+> nuovo codice è in `src/`. Vedi [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLATFORM.md)
+> e [`PLAN.md`](PLAN.md).
+
+## Cross-platform (.NET 8)
+
+La nuova soluzione **`FCIWeb.CrossPlatform.sln`** compila e testa su Linux, macOS e Windows:
+
+```bash
+# richiede .NET SDK 8+
+dotnet test FCIWeb.CrossPlatform.sln -c Release
+```
+
+Nessuna dipendenza proprietaria, nessun segreto, nessun Windows/IIS.
+Stato attuale: logica di dominio portata (`src/FCIWeb.Core`), 26 test verdi; la web app ASP.NET Core
+è in fase M4 (`PLAN.md`). Mappa di conversione completa in
+[`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLATFORM.md).
 
 ---
 
@@ -167,13 +181,16 @@ tracciate come fase **F5** in [`PLAN.md`](PLAN.md) con evidenza dei log.
 
 ## Limiti noti
 
-1. **Non è auto-contenuta**: richiede servizi interni (`WSSicurezza`, `WSProfiles`), SQL Server e
-   SMTP. Non è avviabile "a vuoto" da un utente esterno.
-2. **Dipendenze non ridistribuibili**: `lib/` contiene DLL proprietarie e commerciali. Il codice
-   originale è MIT, ma l'applicazione completa **non** è utilizzabile senza acquisire quelle licenze
-   (vedi [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md)).
-3. **Build non verificata su Linux**: il progetto è .NET Framework e dipende da `System.Web`.
-4. **Nessuna suite di test** al momento.
+1. **Il legacy non è auto-contenuto**: richiede servizi interni (`WSSicurezza`, `WSProfiles`),
+   SQL Server e SMTP, e gira solo su .NET Framework/Windows.
+2. **Dipendenze non ridistribuibili**: le DLL proprietarie/commerciali (`AreaCommonWeb`,
+   `WebServiceModel`, Telerik, Kendo, iTextSharp, WSE3) **non sono nel repository** (né nella
+   history). Vedi [`lib/README.md`](lib/README.md) e [`THIRD-PARTY-NOTICES.md`](THIRD-PARTY-NOTICES.md).
+3. **Porting in corso**: la web app .NET 8 (`src/FCIWeb.Web`) non esiste ancora; oggi il
+   cross-platform copre libreria di dominio + test (fase M4 di `PLAN.md`).
+4. **Build legacy non verificata qui**: la build .NET Framework con Mono si ferma su reference
+   mancanti (`MvcSiteMapProvider`, `Newtonsoft.Json`, Office Interop, NPOI) — difetti tracciati in
+   `PLAN.md` §9.
 5. **Codice morto/duplicato** presente (`old/`, `*Simulato*`, `*_old*`, `*.generated.cs`).
 
 ## Sicurezza

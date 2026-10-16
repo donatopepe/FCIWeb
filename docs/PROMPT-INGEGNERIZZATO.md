@@ -29,14 +29,19 @@ Se un file elencato manca, **segnalalo e fermati** prima di procedere.
 
 ## 2. Obiettivo operativo
 
-Massimizzare il punteggio della rubrica a 12 criteri definita in `PLAN.md §2`, con soglia di
-chiusura **≥ 0.92 (11/12)**, e **nessun criterio di sicurezza/licenza a 0**.
+Rendere FCIWeb **cross-platform (Linux/macOS/Windows)** tramite porting incrementale a **.NET 8**
+(strategia strangler: il legacy `Source/` resta come riferimento, il nuovo codice cresce in `src/`),
+portando la rubrica a 16 criteri definita in `PLAN.md §2` a **≥ 0.92 (15/16)**, senza mai far scendere
+la sicurezza o le licenze sotto il massimo.
 
 Vincoli non negoziabili:
 - **Nessun segreto** (credenziali, password, IP/URL interni, matricole personali) nel working tree né
-  nella history destinata alla pubblicazione.
-- **Nessuna DLL proprietaria o commerciale** (Telerik, Kendo, iTextSharp, `AreaCommonWeb.dll`,
-  `WebServiceModel.dll`, office interop) pubblicata nel repository.
+  nella history git (già ripulita con `git-filter-repo`).
+- **Nessuna dipendenza proprietaria o commerciale** (Telerik, Kendo, iTextSharp, OpenXML/Office
+  Interop, `AreaCommonWeb.dll`, `WebServiceModel.dll`, WSE3) tracciata nel repository o presente
+  nella history.
+- **Ogni feature è "cross-platform" solo se `dotnet test` gira su Linux** (container
+  `mcr.microsoft.com/dotnet/sdk:8.0`). Su Windows/legacy non si fanno affermazioni.
 - **Nessuna affermazione non verificata**: se una build o un test non è stato eseguito, scrivi
   "non eseguito" e spiega il perché.
 - **Nessuna azione distruttiva** (riscrittura history, cancellazione file, rotazione credenziali,
@@ -62,14 +67,14 @@ Esegui, a ogni ciclo, esattamente questa sequenza:
 
 ## 4. Ordine di priorità
 
-1. **Sicurezza** (P0): rimozione segreti + `SECURITY.md` + rotazione documentata.
-2. **Licenze** (P0): esclusione `lib/`, `THIRD-PARTY-NOTICES.md` completo.
-3. **Documentazione** (P1): README + guida completa.
-4. **Riproducibilità** (P1): CI + build tentata con esito reale dichiarato.
-5. **Test** (P1): unit test della logica pura.
-6. **Pulizia** (P2): dead code, vendored, generated.
-7. **Distribuibilità** (P2): `DEMO_MODE` / adapter per i servizi esterni.
-8. **Release** (P2): tag, changelog, checklist.
+1. **Sicurezza** (P0): nessun segreto (tree + history) — fatto, va solo mantenuto.
+2. **Licenze** (P0): nessuna dipendenza proprietaria tracciata — fatto, va solo mantenuto.
+3. **Porting cross-platform** (P1): M2 modelli → M3 EF Core → M4 web app + `DEMO_MODE` → M5/M6 UI.
+4. **Test** (P1): test di caratterizzazione a ogni passo portato, verdi su Linux.
+5. **Documentazione** (P1): README/guida/porting aggiornati a ogni fase.
+6. **Riproducibilità** (P1): CI cross-platform verde; CI legacy informativa.
+7. **Pulizia** (P2): dead code, vendored, generated.
+8. **Release** (P2): Docker multi-arch, tag, changelog, checklist.
 
 ## 5. Definition of Done per ciascun deliverable principale
 
@@ -80,8 +85,10 @@ Esegui, a ogni ciclo, esattamente questa sequenza:
 - `LICENSE`: MIT sul solo codice originale, con esclusione esplicita di `lib/` e dei vendor.
 - `THIRD-PARTY-NOTICES.md`: per ogni dipendenza → nome, versione, licenza, link, stato di
   ridistribuibilità, azione intrapresa.
-- CI: job deterministici; se la build non è possibile, il job esegue validazione statica e lo dichiara.
-- Test: comando univoco documentato (`dotnet test` o equivalente) con output salvato.
+- CI: job deterministici; il job `crossplatform` (`dotnet build` + `dotnet test` su Linux) è
+  bloccante; il job legacy .NET Framework è informativo e dichiara il suo esito reale.
+- Test: comando univoco documentato (`dotnet test FCIWeb.CrossPlatform.sln -c Release`) con output
+  salvato come artifact.
 
 ## 6. Stile
 
