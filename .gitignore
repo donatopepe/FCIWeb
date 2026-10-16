@@ -390,3 +390,16 @@ Da aggiornare sul server.7z
 # Prompt/loop locali
 .pi-loop.json
 .pi-loop.json.lock
+
+# ---------------------------------------------------------------------------
+# Dipendenze proprietarie/commerciali: NON ridistribuibili (vedi lib/README.md)
+# ---------------------------------------------------------------------------
+lib/*.dll
+lib/KENDOUIMVC/
+Source/Scripts/2012.1.214/
+Source/Scripts/kendo/
+Source/Content/2012.1.214/
+Source/Content/kendo/
+Source/Scripts/ce-master.zip
+Source/Scripts/ce-master/ce-master/
+!lib/README.md
