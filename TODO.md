@@ -33,8 +33,13 @@ Tasso casi migration superati = passati/totali; soglia **100%** sui test SQLite;
 - [x] Test HTTP end-to-end (ciclo 11) crea richiesta nuova e verifica transition stale token non sovrascrive aggiornamento.
 - [ ] Ripetere test su SQL Server reale/disposable autorizzato.
 
+## M3 SQL Server provider verification
+- [x] Generare script migration SQL Server idempotente senza connessione; test assert DDL/history/index/separatore batch.
+- [x] Suite Linux: Core 96 + Data 12 + Web 11 = 119 test; build warn-as-error clean.
+- [ ] Applicare script a SQL Server disposable autorizzato; provider runtime resta non verificato.
+
 ## Prossimi task aperti
-- [ ] SQL Server provider: eseguire migration SQL Server con database temporaneo autorizzato; non dichiarare pronto prima.
+- [ ] M5 SQL Server integration: database temporaneo autorizzato.
 - [ ] M6: completare viste legacy.
 - [ ] M7: porting documenti OpenXML.
 - [ ] M8: multi-arch e release.

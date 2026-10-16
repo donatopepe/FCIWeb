@@ -41,13 +41,14 @@ con PBKDF2-SHA256, autorizzazione per ruolo, container non-root, nessun header `
 Test:
 
 ```bash
-dotnet test FCIWeb.CrossPlatform.sln -c Release   # 118 test
+dotnet test FCIWeb.CrossPlatform.sln -c Release   # 119 test
 ```
 
 Stato: `src/FCIWeb.Core` (dominio + sicurezza), `src/FCIWeb.Data` (EF Core) e `src/FCIWeb.Web`
 (ASP.NET Core MVC) funzionanti in demo. SQLite persistente è default e applica migrazioni EF
-all'avvio; seleziona RAM con `FCIWEB_STORE=memory`. SQL Server provider è incluso ma non ancora
-verificato end-to-end. Resta il porting viste legacy (M6). Dettagli in
+all'avvio; seleziona RAM con `FCIWEB_STORE=memory`. SQL Server provider e generation script
+migration sono testati offline; applicazione a server live non verificata. Resta il porting viste
+legacy (M6). Dettagli in
 [`PLAN.md`](PLAN.md) e [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLATFORM.md).
 
 ---

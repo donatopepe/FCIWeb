@@ -31,13 +31,13 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 9 | `PLAN.md` | ✅ | questo file |
 | 10 | `docs/PROMPT-INGEGNERIZZATO.md` | ✅ | file |
 | 11 | CI verde: validazione statica | ✅ | run GitHub `38876403094` job "Validazione statica" → success |
-| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 118/118; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
+| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 119/119; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
 | 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 11**: **16/16 = 1.00** per i criteri della rubrica. La copertura funzionale
+**Misurato al ciclo 12**: **16/16 = 1.00** per i criteri della rubrica. La copertura funzionale
 rimane in evoluzione: migrations SQLite sono testate; SQL Server end-to-end non è ancora verificato.
 
 ## 3. Fatti verificati
@@ -151,6 +151,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 9 | 2026-10-16 | M3: migrazioni EF versionate, design-time factory, adozione schema EnsureCreated senza perdita | ✅* | suite 116/116; build /warnaserror 0/0; Compose login 200 |
 | 10 | 2026-10-16 | M5 partial: token versione + compare-and-swap transizioni; stale-write tests repository/HTTP | ✅* | suite 118/118; build /warnaserror 0/0 |
 | 11 | 2026-10-16 | Test HTTP stale token con SQLite persistente e richiesta nuova | ✅* | suite 118/118; build /warnaserror 0/0; nessun push |
+| 12 | 2026-10-16 | Test generation migration script SQL Server idempotente senza connessione live | ✅* | test Data 12/12, suite 119/119; build /warnaserror 0/0 |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -302,6 +303,15 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Upgrade schema `EnsureCreated` v1 aggiunge `Version` e conserva righe preesistenti.
 - Suite Linux 96 Core + 11 Data + 11 Web = **118/118**; build `/warnaserror` zero warning/errori.
 - Limite: concurrency race verificata SQLite; SQL Server non testato end-to-end.
+
+### Dettaglio ciclo 12 (M3 — SQL Server migration script design-time)
+
+- Aggiunto test provider SQL Server (`UseSqlServer` senza aprire connessione) che genera migration
+  script idempotente via `IMigrator.GenerateScript` e verifica DDL tabella, history, indici, token
+  `Version` e batch `GO`.
+- Il test valida il design-time SQL generato; non simula né dichiara connessione o applicazione a DB reale.
+- Verifica Linux: Core 96 + Data 12 + Web 11 = **119/119**; build `/warnaserror` 0 warning/errori.
+- SQL Server live resta bloccato da assenza di istanza disposable autorizzata.
 
 ## 11. Stato pubblicazione
 

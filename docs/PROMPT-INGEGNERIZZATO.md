@@ -122,5 +122,6 @@ cambiamento in src/tests; verifica Linux con `docker run --rm -v /home/public/FC
 /src mcr.microsoft.com/dotnet/sdk:8.0 bash -lc 'dotnet test FCIWeb.CrossPlatform.sln -c Release'`,
 build `/warnaserror`, e Docker smoke se hosting/DB cambia. Aggiorna PLAN §2, §6, §10, TODO e docs
 solo con evidenze. Gate: secret/history checks, zero binari proprietari, nessun push, nessuna azione
-distruttiva senza owner. Commit solo con gate verdi. Se bloccato, formula domanda precisa.
+distruttiva senza owner. Per provider DB, distinguere generation script design-time da SQL Server live.
+Commit solo con gate verdi. Se bloccato, formula domanda precisa.
 ```
