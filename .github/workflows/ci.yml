@@ -1,0 +1,104 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Validazione statica: gira su Linux, è bloccante.
+  # ---------------------------------------------------------------------------
+  validate:
+    name: Validazione statica (config, segreti, docs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Verifica file di progetto obbligatori
+        run: |
+          set -e
+          for f in README.md LICENSE PLAN.md THIRD-PARTY-NOTICES.md SECURITY.md CONTRIBUTING.md; do
+            test -f "$f" || { echo "MANCANTE: $f"; exit 1; }
+            echo "OK: $f"
+          done
+          for f in docs/ANALISI-CODICE.md docs/GUIDA-COMPLETA.md docs/PROMPT-INGEGNERIZZATO.md; do
+            test -f "$f" || { echo "MANCANTE: $f"; exit 1; }
+            echo "OK: $f"
+          done
+
+      - name: Validazione XML dei file di configurazione
+        run: |
+          set -e
+          shopt -s nullglob
+          for f in Source/*.config Source/*.config.sample Source/connection.config.sample Source/packages.config; do
+            [ -f "$f" ] || continue
+            python3 -c "import xml.dom.minidom,sys; xml.dom.minidom.parse(sys.argv[1])" "$f"
+            echo "XML OK: $f"
+          done
+
+      - name: Gate segreti (nessuna credenziale nel working tree)
+        run: |
+          set -e
+          # Cerca pattern tipici di segreti; esclude i template (*.sample) e la documentazione.
+          if grep -rInE "Password=[^\"'<]{3,}|pwd[0-9]{3,}|User ID=[A-Za-z0-9_]+;.*Password=" \
+               --include='*.config' --include='*.cs' --include='*.csproj' --include='*.cshtml' \
+               --include='*.json' --include='*.yml' --include='*.yaml' \
+               Source lib 2>/dev/null \
+               | grep -vE '\.sample|__SET_ME__|<DB_|placeholder' ; then
+            echo "::error::Possibili segreti trovati nel working tree."
+            exit 1
+          fi
+          echo "Gate segreti: OK"
+
+      - name: Presenza template di configurazione
+        run: |
+          set -e
+          test -f Source/connection.config.sample || { echo "MANCANTE: connection.config.sample"; exit 1; }
+          echo "Template di configurazione: OK"
+
+      - name: Avviso dipendenze non ridistribuibili
+        run: |
+          if [ -d lib ] && ls lib/*.dll >/dev/null 2>&1; then
+            echo "::warning::La cartella lib/ contiene DLL proprietarie/commerciali: non pubblicare in un repository pubblico. Vedi THIRD-PARTY-NOTICES.md."
+          fi
+
+  # ---------------------------------------------------------------------------
+  # Build .NET Framework: richiede Windows e le DLL di lib/. Informativa
+  # (continue-on-error) finché il percorso non è verificato — vedi PLAN.md F4.
+  # ---------------------------------------------------------------------------
+  build:
+    name: Build .NET Framework (informativa)
+    runs-on: windows-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: NuGet restore
+        run: nuget restore FCIWeb.sln
+
+      - name: Build
+        run: msbuild FCIWeb.sln /p:Configuration=Release /p:Platform="Any CPU" /verbosity:minimal
+
+      - name: Upload log build
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msbuild-log
+          path: '**/*.log'
+          if-no-files-found: ignore

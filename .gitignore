@@ -361,3 +361,32 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+# ---------------------------------------------------------------------------
+# FCIWeb — sicurezza e configurazione locale (NON versionare valori reali)
+# ---------------------------------------------------------------------------
+# Connection string e configurazioni reali (usare i *.sample)
+Source/connection.config
+Source/appSettings.config
+Source/Web.*.local.config
+**/Web.config.local
+**/*.pubxml
+**/*.pubxml.user
+**/*.PublishSettings
+**/*.publishsettings
+**/secrets.json
+**/.secrets/
+Source/Doc_Files/**
+
+# Artefatti di build
+Source/bin/
+Source/obj/
+*.dll.config
+
+# File temporanei del repository
+Da aggiornare sul server.7z
+*.7z
+*.zip.tmp
+
+# Prompt/loop locali
+.pi-loop.json
+.pi-loop.json.lock

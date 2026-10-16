@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+  TEMPLATE di configurazione delle connection string per FCIWeb.
+
+  ISTRUZIONI
+  1. Copia questo file in `Source/connection.config` (il file reale NON e' versionato).
+  2. Sostituisci i placeholder __NOME__ con i valori del TUO ambiente.
+  3. Non committare mai il file reale: vedi SECURITY.md.
+
+  NOTA: `Source/Web.config` referenzia questa sezione con
+  configSource="connection.config", quindi il file DEVE esistere a runtime ed essere
+  un frammento XML con la sola radice connectionStrings.
+-->
+<connectionStrings>
+  <!-- Contesto principale dell'area FCI (Entity Framework 5) -->
+  <add name="FCIContext"
+       connectionString="Data Source=__SQL_SERVER__;Initial Catalog=FCI;User ID=__DB_USER__;Password=__DB_PASSWORD__"
+       providerName="System.Data.SqlClient" />
+
+  <!-- Servizi applicativi ASP.NET -->
+  <add name="ApplicationServices"
+       connectionString="Data Source=__SQL_SERVER__;Database=FCI;Trusted_Connection=False;MultipleActiveResultSets=true;User ID=__DB_USER__;Password=__DB_PASSWORD__"
+       providerName="System.Data.SqlClient" />
+
+  <!-- In alternativa, autenticazione integrata (identita' del pool IIS):
+  <add name="FCIContext"
+       connectionString="Data Source=__SQL_SERVER__;Initial Catalog=FCI;Integrated Security=True"
+       providerName="System.Data.SqlClient" />
+  <add name="ApplicationServices"
+       connectionString="Data Source=__SQL_SERVER__;Database=FCI;Integrated Security=True;MultipleActiveResultSets=true"
+       providerName="System.Data.SqlClient" />
+  -->
+
+  <!-- ELMAH: logging errori su database.
+       Era referenziato in Web.config ma assente: senza questa voce ELMAH non registra.
+       Decommenta e valorizza se usi il logging su DB. -->
+  <!--
+  <add name="elmah-sql"
+       connectionString="Data Source=__SQL_SERVER__;Initial Catalog=ELMAH;Integrated Security=SSPI"
+       providerName="System.Data.SqlClient" />
+  -->
+</connectionStrings>

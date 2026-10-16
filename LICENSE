@@ -1,0 +1,41 @@
+MIT License
+
+Copyright (c) 2023-2026 Donato Pepe
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------
+
+NOTA SUL PERIMETRO DELLA LICENZA (SCOPE NOTICE)
+
+Questa licenza MIT si applica esclusivamente al codice sorgente originale
+prodotto dagli autori di FCIWeb e presente in questo repository.
+
+NON si applica a:
+  * le librerie e gli SDK di terze parti, commerciali o proprietari, elencati in
+    THIRD-PARTY-NOTICES.md (a titolo di esempio: Telerik.Web.Mvc, Kendo UI for MVC,
+    iTextSharp, AreaCommonWeb.dll, WebServiceModel.dll,
+    Microsoft.Office.Interop.Word, Microsoft.Web.Services3);
+  * il software di terze parti vendorizzato in Source/Scripts e Source/Content
+    (jQuery, jQuery UI, jquery.validate, Modernizr, Kendo UI, x-spreadsheet,
+    ce-master, NPOI, DotNetOpenAuth, ELMAH e altri), che resta soggetto alle
+    rispettive licenze.
+
+Chi ridistribuisce o modifica questo repository deve verificare e rispettare le
+licenze di tali componenti, che NON sono ridistribuibili senza i relativi diritti.

@@ -50,23 +50,23 @@
     <PublishDatabaseSettings>
       <Objects>
         <ObjectGroup Name="ApplicationServices-Distribuzione" Order="1" Enabled="False">
-          <Destination Path="Data Source=FILESERVER%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bUser ID=***REMOVED***%3bPassword=***REMOVED***" />
+          <Destination Path="Data Source=__SET_ME__%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bIntegrated Security=True" />
           <Object Type="dbFullSql" Enabled="False">
-            <PreSource Path="Data Source=FILESERVER%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bUser ID=***REMOVED***%3bPassword=***REMOVED***" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
+            <PreSource Path="Data Source=__SET_ME__%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bIntegrated Security=True" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
             <Source Path="obj\Debug\AutoScripts\ApplicationServices-Distribuzione_SchemaOnly.sql" Transacted="True" />
           </Object>
         </ObjectGroup>
         <ObjectGroup Name="RichiestaContext-Distribuzione" Order="2">
           <Destination Path="" />
           <Object Type="dbFullSql">
-            <PreSource Path="Data Source=FILESERVER%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bUser ID=***REMOVED***%3bPassword=***REMOVED***%3bApplication Name=EntityFramework" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
+            <PreSource Path="Data Source=__SET_ME__%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bIntegrated Security=True%3bApplication Name=EntityFramework" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
             <Source Path="obj\Debug\AutoScripts\RichiestaContext-Distribuzione_SchemaOnly.sql" Transacted="True" />
           </Object>
         </ObjectGroup>
         <ObjectGroup Name="ResourcesContext-Distribuzione" Order="3">
           <Destination Path="" />
           <Object Type="dbFullSql">
-            <PreSource Path="Data Source=FILESERVER%3bInitial Catalog=Resources%3bPersist Security Info=True%3bUser ID=***REMOVED***%3bPassword=***REMOVED***%3bApplication Name=EntityFramework" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
+            <PreSource Path="Data Source=__SET_ME__%3bInitial Catalog=Resources%3bPersist Security Info=True%3bIntegrated Security=True%3bApplication Name=EntityFramework" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
             <Source Path="obj\Debug\AutoScripts\ResourcesContext-Distribuzione_SchemaOnly.sql" Transacted="True" />
           </Object>
         </ObjectGroup>
@@ -94,21 +94,21 @@
         <ObjectGroup Name="ApplicationServices-Distribuzione" Order="1" Enabled="False">
           <Destination Path="" />
           <Object Type="dbFullSql" Enabled="True">
-            <PreSource Path="Data Source=FILESERVER%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bUser ID=***REMOVED***%3bPassword=***REMOVED***" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
+            <PreSource Path="Data Source=__SET_ME__%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bIntegrated Security=True" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
             <Source Path="obj\Release\AutoScripts\ApplicationServices-Distribuzione_SchemaOnly.sql" Transacted="True" />
           </Object>
         </ObjectGroup>
         <ObjectGroup Name="RichiestaContext-Distribuzione" Order="2">
           <Destination Path="" />
           <Object Type="dbFullSql">
-            <PreSource Path="Data Source=FILESERVER%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bUser ID=***REMOVED***%3bPassword=***REMOVED***%3bApplication Name=EntityFramework" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
+            <PreSource Path="Data Source=__SET_ME__%3bInitial Catalog=GRADIMENTO%3bPersist Security Info=True%3bIntegrated Security=True%3bApplication Name=EntityFramework" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
             <Source Path="obj\Release\AutoScripts\RichiestaContext-Distribuzione_SchemaOnly.sql" Transacted="True" />
           </Object>
         </ObjectGroup>
         <ObjectGroup Name="ResourcesContext-Distribuzione" Order="3">
           <Destination Path="" />
           <Object Type="dbFullSql">
-            <PreSource Path="Data Source=FILESERVER%3bInitial Catalog=Resources%3bPersist Security Info=True%3bUser ID=***REMOVED***%3bPassword=***REMOVED***%3bApplication Name=EntityFramework" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
+            <PreSource Path="Data Source=__SET_ME__%3bInitial Catalog=Resources%3bPersist Security Info=True%3bIntegrated Security=True%3bApplication Name=EntityFramework" ScriptSchema="True" ScriptData="False" CopyAllFullTextCatalogs="False" DriDefaults="True" />
             <Source Path="obj\Release\AutoScripts\ResourcesContext-Distribuzione_SchemaOnly.sql" Transacted="True" />
           </Object>
         </ObjectGroup>
