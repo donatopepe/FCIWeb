@@ -74,6 +74,56 @@ namespace FCIWeb.Web.Tests
         }
 
         [Fact]
+        public async Task StaleVersion_ChangeState_IsRejectedWithoutOverwritingFirstUpdate()
+        {
+            using var client = TestClient.Create(_factory);
+            await TestClient.LoginAsync(client, "user", "User123!");
+            var list = await client.GetAsync("/Richieste");
+            var formPage = await client.GetAsync("/Richieste/Create");
+            var formHtml = await formPage.Content.ReadAsStringAsync();
+            var tokenMatch = System.Text.RegularExpressions.Regex.Match(formHtml, "name=\"__RequestVerificationToken\"[^>]*value=\"([^\"]+)\"");
+            Assert.True(tokenMatch.Success);
+            var createForm = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("NDG", "CONC-1"),
+                new KeyValuePair<string, string>("Intestazione", "Concurrency check"),
+                new KeyValuePair<string, string>("__RequestVerificationToken", tokenMatch.Groups[1].Value)
+            });
+            var createResponse = await client.PostAsync("/Richieste/Create", createForm);
+            Assert.Equal(System.Net.HttpStatusCode.Redirect, createResponse.StatusCode);
+            var createdUri = createResponse.Headers.Location.ToString();
+            var id = Guid.Parse(createdUri.AsSpan(createdUri.LastIndexOf('/') + 1));
+
+            var details = await client.GetAsync(createdUri);
+            var detailHtml = await details.Content.ReadAsStringAsync();
+            var versionMatch = System.Text.RegularExpressions.Regex.Match(detailHtml, "name=\"version\" value=\"([^\"]+)\"");
+            Assert.True(versionMatch.Success);
+            var staleVersion = versionMatch.Groups[1].Value;
+            var token = await TestClient.GetAntiforgeryTokenAsync(client, "/Richieste/Details/" + id);
+
+            async Task<System.Net.HttpStatusCode> Change(string nextState, string reason)
+            {
+                var form = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("id", id.ToString()),
+                    new KeyValuePair<string, string>("nuovo", nextState),
+                    new KeyValuePair<string, string>("version", staleVersion),
+                    new KeyValuePair<string, string>("motivazione", reason),
+                    new KeyValuePair<string, string>("__RequestVerificationToken", token)
+                });
+                return (await client.PostAsync("/Richieste/CambiaStato", form)).StatusCode;
+            }
+
+            Assert.Equal(System.Net.HttpStatusCode.Redirect, await Change("1", "first update"));
+            Assert.Equal(System.Net.HttpStatusCode.Redirect, await Change("4", "stale update"));
+            var refreshed = await client.GetAsync("/Richieste/Details/" + id);
+            var finalHtml = await refreshed.Content.ReadAsStringAsync();
+            Assert.Contains("Inviata", finalHtml);
+            Assert.Contains("first update", finalHtml);
+            Assert.DoesNotContain("stale update", finalHtml);
+        }
+
+        [Fact]
         public async Task Create_WithoutAntiforgeryToken_IsRejected()
         {
             using var client = TestClient.Create(_factory);

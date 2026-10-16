@@ -31,7 +31,7 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 9 | `PLAN.md` | ✅ | questo file |
 | 10 | `docs/PROMPT-INGEGNERIZZATO.md` | ✅ | file |
 | 11 | CI verde: validazione statica | ✅ | run GitHub `38876403094` job "Validazione statica" → success |
-| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 117/117; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
+| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 118/118; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
 | 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
@@ -149,7 +149,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 7 | 2026-10-16 | Cybersecurity + M4: web app ASP.NET Core avviabile e usabile in DEMO_MODE | ✅ | container Linux: login/elenco/create/ricerca OK; 105 test; header di sicurezza |
 | 8 | 2026-10-16 | M3: EF Core SQLite/SQL Server provider, test persistenza, wiring web, volume Docker | ✅* | 113 test passati; build /warnaserror 0/0; Compose up, login 200, DB sul volume |
 | 9 | 2026-10-16 | M3: migrazioni EF versionate, design-time factory, adozione schema EnsureCreated senza perdita | ✅* | suite 116/116; build /warnaserror 0/0; Compose login 200 |
-| 10 | 2026-10-16 | M5 partial: token versione + compare-and-swap transizioni; stale-write test | ✅* | suite 117/117; build /warnaserror 0/0; HTTP tests verdi |
+| 10 | 2026-10-16 | M5 partial: token versione + compare-and-swap transizioni; stale-write tests repository/HTTP | ✅* | suite 118/118; build /warnaserror 0/0 |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -275,7 +275,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - `LegacySchemaAdopter` riconosce database SQLite preesistenti con tabella `Richieste` e history assente/vuota;
   controlla colonne e registra migration iniziale senza drop/recreate. Test specifico verifica record preservato.
 - `MigrationTests`: DB vuoto, migration idempotente, upgrade da `EnsureCreated`, schema incompatibile rifiutato.
-- Verifica Linux: Core 96 + Data 10 + Web 10 = **116/116**; build `/warnaserror` 0 warning/errori.
+- Verifica Linux ciclo 9: Core 96 + Data 10 + Web 10 = **116/116**; build `/warnaserror` 0 warning/errori.
 - Compose smoke: login 200, DB creato, startup completato.
 - Limite: migration SQL Server non testata senza istanza temporanea autorizzata.
 
@@ -284,11 +284,14 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Aggiunto token `Version` GUID application-managed al dominio e alla migration SQLite.
 - `TryChangeState` usa compare-and-swap su ID + versione attesa; un token stale riceve conflitto
   esplicito senza sovrascrivere lo stato precedente.
-- Il form web invia il token versione; API repository accetta `expectedVersion` opzionale.
+- Il form web invia il token versione; API repository accetta `expectedVersion` opzionale; store RAM
+  serializza transizioni sotto lock.
 - Test con due `DbContext`: prima transizione aggiorna, la seconda con versione obsoleta fallisce;
   rilettura conferma che stato e motivazione della prima operazione sono intatti.
+- Test HTTP end-to-end crea una richiesta, invia due transizioni con stesso token e verifica che il
+  secondo POST non sovrascriva il primo.
 - Upgrade schema `EnsureCreated` v1 aggiunge `Version` e conserva righe preesistenti.
-- Suite Linux 96 Core + 11 Data + 10 Web = **117/117**; build `/warnaserror` zero warning/errori.
+- Suite Linux 96 Core + 11 Data + 11 Web = **118/118**; build `/warnaserror` zero warning/errori.
 - Limite: concurrency race verificata SQLite; SQL Server non testato end-to-end.
 
 ## 11. Stato pubblicazione

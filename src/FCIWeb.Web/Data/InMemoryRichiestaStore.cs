@@ -14,6 +14,7 @@ namespace FCIWeb.Web.Data
     public sealed class InMemoryRichiestaStore : IRichiestaStore
     {
         private readonly ConcurrentDictionary<Guid, Richiesta> _items = new ConcurrentDictionary<Guid, Richiesta>();
+        private readonly object _stateTransitionLock = new object();
 
         public InMemoryRichiestaStore()
         {
@@ -67,30 +68,33 @@ namespace FCIWeb.Web.Data
         public bool TryChangeState(Guid id, StatoRichiesta nuovo, string motivazione, out string errorMessage, Guid? expectedVersion = null)
         {
             errorMessage = null;
-            if (!_items.TryGetValue(id, out var r))
+            lock (_stateTransitionLock)
             {
-                errorMessage = "Richiesta non trovata.";
-                return false;
-            }
+                if (!_items.TryGetValue(id, out var r))
+                {
+                    errorMessage = "Richiesta non trovata.";
+                    return false;
+                }
 
-            if (expectedVersion.HasValue && expectedVersion.Value != r.Version)
-            {
-                errorMessage = "La richiesta è stata modificata da un'altra operazione. Ricaricare i dati e riprovare.";
-                return false;
-            }
-            if (!r.PuoCambiareIn(nuovo))
-            {
-                errorMessage = $"Transizione non ammessa: {r.Stato} -> {nuovo}.";
-                return false;
-            }
+                if (expectedVersion.HasValue && expectedVersion.Value != r.Version)
+                {
+                    errorMessage = "La richiesta è stata modificata da un'altra operazione. Ricaricare i dati e riprovare.";
+                    return false;
+                }
+                if (!r.PuoCambiareIn(nuovo))
+                {
+                    errorMessage = $"Transizione non ammessa: {r.Stato} -> {nuovo}.";
+                    return false;
+                }
 
-            r.Stato = nuovo;
-            r.Version = Guid.NewGuid();
-            if (!String.IsNullOrWhiteSpace(motivazione))
-            {
-                r.Note = String.IsNullOrWhiteSpace(r.Note) ? motivazione : r.Note + " | " + motivazione;
+                r.Stato = nuovo;
+                r.Version = Guid.NewGuid();
+                if (!String.IsNullOrWhiteSpace(motivazione))
+                {
+                    r.Note = String.IsNullOrWhiteSpace(r.Note) ? motivazione : r.Note + " | " + motivazione;
+                }
+                return true;
             }
-            return true;
         }
 
         public bool Delete(Guid id) => _items.TryRemove(id, out _);

@@ -41,7 +41,7 @@ con PBKDF2-SHA256, autorizzazione per ruolo, container non-root, nessun header `
 Test:
 
 ```bash
-dotnet test FCIWeb.CrossPlatform.sln -c Release   # 117 test
+dotnet test FCIWeb.CrossPlatform.sln -c Release   # 118 test
 ```
 
 Stato: `src/FCIWeb.Core` (dominio + sicurezza), `src/FCIWeb.Data` (EF Core) e `src/FCIWeb.Web`

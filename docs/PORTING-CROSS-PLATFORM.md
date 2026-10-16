@@ -74,7 +74,7 @@ FCIWeb.CrossPlatform.sln       (nuovo .NET 8 — target)
 | M1 | Porting utility pure (`DateUtil`, `Extensions`, `MapObj`) + test | ✅ (26 test) |
 | M2 | Porting modelli di dominio (entità) senza `System.Web`/`System.Drawing` | ✅ (42 test) |
 | M3 | EF Core context + repository; migrations SQLite; provider SQL Server compilato | ✅* | test SQLite; migrazione iniziale versionata; SQL Server runtime non verificato |
-| M4 | Web app ASP.NET Core: hosting, routing, auth cookie, SQLite DEMO_MODE | ✅ (117 test, Docker Linux) |
+| M4 | Web app ASP.NET Core: hosting, routing, auth cookie, SQLite DEMO_MODE | ✅ (118 test, Docker Linux) |
 | M5 | Repository EF + transizioni optimistic concurrency; adapter servizi esterni | 🔶 (SQLite concurrency testata; SQL Server e servizi esterni aperti) |
 | M6 | Porting viste Razor a runtime + UI (sostituzione Telerik/Kendo) | ⏳ |
 | M7 | Documenti: sostituzione Office Interop con OpenXml | ⏳ |
