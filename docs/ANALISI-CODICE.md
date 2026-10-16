@@ -83,7 +83,7 @@ escluse dal repo pubblico e dichiarate come prerequisiti/licenze separate (vedi
 
 - `WebServiceModel.WSSicurezza.Service` (anagrafica utenze)
 - `WebServiceModel.WSProfiles.Service` (profili)
-- SQL Server `FILESERVER` (cataloghi `FCI`, `GRADIMENTO`, `Resources`)
+- SQL Server interno (hostname redatto) (cataloghi `FCI`, `GRADIMENTO`, `Resources`)
 - SMTP interno
 - `AreaCommonWeb.*` per menu, contesto applicativo, repository risorse
 
