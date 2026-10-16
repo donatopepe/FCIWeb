@@ -5,14 +5,14 @@ namespace FCIWeb.Core.Tests
 {
     public class MapObjTests
     {
-        private class Target
+        private sealed class Target
         {
             public int Id { get; set; }
             public string Nome { get; set; }
             public string NonImpostabile { get; }
         }
 
-        private class OtherTarget
+        private sealed class OtherTarget
         {
             public int Id { get; set; }
             public string Nome { get; set; }

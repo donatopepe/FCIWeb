@@ -1,7 +1,7 @@
 # PLAN — FCIWeb: risanamento, cross-platform e pubblicabilità
 
 > Documento vivo. Ogni ciclo del loop aggiorna lo stato delle fasi e la tabella di avanzamento.
-> Ultima revisione: 2026-10-16 (ciclo 3 — avvio porting cross-platform .NET 8)
+> Ultima revisione: 2026-10-16 (ciclo 8 — EF Core SQLite + app persistente, revalidazione completa)
 
 ## 1. Obiettivo
 
@@ -31,15 +31,15 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 9 | `PLAN.md` | ✅ | questo file |
 | 10 | `docs/PROMPT-INGEGNERIZZATO.md` | ✅ | file |
 | 11 | CI verde: validazione statica | ✅ | run GitHub `38876403094` job "Validazione statica" → success |
-| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | run `38876403094` job "Build + test cross-platform" → success (26 test) |
+| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 113/113; build /warnaserror 0/0; workflow GitHub non ancora eseguito sul commit corrente |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
-| 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | container avviato in 1s; curl: login/elenco/create/ricerca OK; 105 test |
+| 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 7**: **16/16 = 1.00** (soglia obiettivo 0.92 superata).
-La rubrica misura la *pubblicabilità e avviabilità*; la copertura funzionale del dominio legacy
-prosegue nelle fasi M3/M5/M6.
+**Misurato al ciclo 8**: **16/16 = 1.00** per i criteri della rubrica. La copertura funzionale
+rimane in evoluzione: il backend M3 è integrato, ma le migrazioni versionate e SQL Server end-to-end
+non sono ancora verificate.
 
 ## 3. Fatti verificati
 
@@ -89,9 +89,9 @@ prosegue nelle fasi M3/M5/M6.
 | F5 | Test logica pura | `tests/FCIWeb.Core.Tests` (26 test) | ✅ |
 | F6 | Porting utility pure | `src/FCIWeb.Core/Utility` | ✅ |
 | M2 | Porting modelli di dominio (senza `System.Web`/`System.Drawing`) | `src/FCIWeb.Core/Models` + `Services/IResourcesLookup` | ✅ |
-| M3 | EF Core + migrazioni + provider SQLite/SQL Server | `src/FCIWeb.Data` | ⏳ |
+| M3 | EF Core repository; SQLite demo + provider SQL Server | `src/FCIWeb.Data` | ✅* (schema EnsureCreated; migrations non fatte) |
 | M4 | Web app ASP.NET Core + `DEMO_MODE` avviabile | `src/FCIWeb.Web` + Dockerfile | ✅ |
-| M5 | Repository/servizi + adapter servizi esterni | `src/FCIWeb.App` | 🔶 (store in memoria) |
+| M5 | Repository/servizi + adapter servizi esterni | `src/FCIWeb.Data`, `src/FCIWeb.Web/Data` | 🔶 (repository EF + adapter web; servizi esterni non portati) |
 | M6 | Viste Razor runtime + UI | `src/FCIWeb.Web/Views` | ⏳ |
 | M7 | Documenti: OpenXml al posto di Office Interop | `src/FCIWeb.Documents` | ⏳ |
 | M8 | Docker multi-arch + release | `Dockerfile`, tag | ⏳ |
@@ -148,6 +148,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 5 | 2026-10-16 | De-branding completo: nessun riferimento all'azienda (testi, acronimi, loghi, URL) in tree e history | ✅ | clone fresco: 0 hit; `logo.svg` generico; gate storia OK |
 | 6 | 2026-10-16 | M2: porting entità di dominio a POCO + `IResourcesLookup`/`ResourcesDisplay` | ✅ | `dotnet build /warnaserror` OK; `dotnet test` → 42/42 |
 | 7 | 2026-10-16 | Cybersecurity + M4: web app ASP.NET Core avviabile e usabile in DEMO_MODE | ✅ | container Linux: login/elenco/create/ricerca OK; 105 test; header di sicurezza |
+| 8 | 2026-10-16 | M3: EF Core SQLite/SQL Server provider, test persistenza, wiring web, volume Docker | ✅* | 113 test passati; build /warnaserror 0/0; Compose up, login 200, DB sul volume |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -230,6 +231,41 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - **Verifica reale**: immagine costruita, container avviato in 1s, curl su login/elenco/create/ricerca;
   antiforgery mancante → 400; login errato → 200 con errore; ruolo user su delete → accesso negato.
 - **Test**: 96 dominio + 9 integrazione web = **105**, verdi.
+
+### Dettaglio ciclo 8 (M3 — persistenza)
+
+- Aggiunto `src/FCIWeb.Core/Models/Richiesta.cs` come entità di dominio condivisa; MVC mantiene un
+  tipo derivato solo per l'integrazione UI legacy.
+- Aggiunto `src/FCIWeb.Data`: `FCIWebContext`, mapping/indici EF Core 8, provider SQLite e SQL Server,
+  `EfRichiestaRepository` (CRUD, filtri, validazione transizioni, note motivazione).
+- `FCIWEB_STORE=sqlite` (default): app crea `data/fciweb.db`; `FCIWEB_STORE=memory` seleziona lo store
+  volatile. Compose monta volume persistente `/app/data`.
+- Test SQLite reali su connection `:memory:` mantenuta aperta: 7 casi passati, incluso riapertura
+  contesto, filtro/ordinamento, transizioni valide/invalide e delete. Test web crea una richiesta con
+  POST autenticato su file temporaneo e la legge con GET successivo.
+- **Verifica ciclo 8**: `dotnet test FCIWeb.CrossPlatform.sln -c Release` → Core 96/96, Data 7/7,
+  Web 10/10 = **113/113**; `dotnet build ... /warnaserror` → **0 warning, 0 errori**.
+- Docker `build` da context ridotto → OK; `docker compose up -d --build` → login 200, DB creato sul
+  volume, UID `app` non-root. `docker compose down` eseguito; dati nel volume persistono.
+- **Limiti**: SQL Server provider solo compilato, non testato con un'istanza DB in questo ciclo;
+  schema usa `EnsureCreated`, non migrazioni versionate (`dotnet ef migrations` rimane backlog).
+
+### Dettaglio ciclo 8 (M3 — persistenza)
+
+- Entità `Richiesta` condivisa in `FCIWeb.Core.Models`; il tipo MVC deriva dal modello di dominio.
+- Aggiunto `src/FCIWeb.Data`: EF Core 8.0.11, `FCIWebContext`, mapping/indici, repository CRUD,
+  filtri e transizioni. Provider SQLite e SQL Server inclusi.
+- Web default SQLite persistente (`data/fciweb.db`); `FCIWEB_STORE=memory` seleziona lo store volatile.
+  Compose monta volume `/app/data`; directory scrivibile dall'UID non-root.
+- Test SQLite su connessione in-memory condivisa: reopen context, filtri/ordinamento, transizione
+  valida/invalida, motivazione, record inesistente, delete e validazione.
+- `TODO.md` definisce obiettivo, metrica/soglia, casi, dipendenze e residui.
+- **Test Linux**: Core 96/96, Data 7/7, Web 10/10 = **113/113**.
+- **Build** Release `/warnaserror`: **0 warning, 0 errori**.
+- **Docker/Compose**: build OK; `compose up` → login 200, UID `app`, DB presente sul volume; down OK.
+- Gate segreti tree/history e XML OK; zero binari proprietari tracciati. Nessun push.
+- **Limiti**: schema via `EnsureCreated` (migrazioni EF versionate non implementate); provider
+  SQL Server compilato, ma non integrato/testato con un server in questo ciclo.
 
 ## 11. Stato pubblicazione
 

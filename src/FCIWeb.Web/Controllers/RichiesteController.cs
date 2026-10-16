@@ -3,6 +3,7 @@ using FCIWeb.Web.Data;
 using FCIWeb.Web.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StatoRichiesta = FCIWeb.Core.Models.StatoRichiesta;
 
 namespace FCIWeb.Web.Controllers
 {

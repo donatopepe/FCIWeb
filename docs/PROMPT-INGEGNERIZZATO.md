@@ -115,12 +115,13 @@ CRITERI RUBRICA: <n/12>
 ## 8. Versione ridotta per il loop automatico (prompt cron)
 
 ```
-Progetto FCIWeb (/home/public/FCIWeb). Leggi PLAN.md, docs/ANALISI-CODICE.md e
-docs/PROMPT-INGEGNERIZZATO.md. Esegui UN solo ciclo del metodo §3 del prompt:
-scegli il primo item non fatto dal backlog (PLAN.md §9), verifica con evidenza reale,
-aggiorna PLAN.md (§6 fasi e §10 registro cicli) e, se serve, i docs.
-Vincoli: nessun segreto nel repo, nessuna DLL proprietaria pubblicata, nessuna
-affermazione non verificata, nessuna azione distruttiva senza conferma. Rispondi
-nel formato §7. Se non c'è nulla di eseguibile senza input umano, scrivi BLOCKED e
-la domanda esatta per l'owner.
+Progetto FCIWeb (/home/public/FCIWeb), porting cross-platform .NET 8. Prima leggi PLAN.md,
+TODO.md, docs/PORTING-CROSS-PLATFORM.md, docs/ANALISI-CODICE.md e questo prompt; aggiorna CodeGraph
+(`codegraph sync .`) se stale. Esegui UN ciclo: primo item aperto PLAN §9/TODO; implementa un solo
+cambiamento in src/tests; verifica su Linux con `docker run --rm -v /home/public/FCIWeb:/src -w
+/src mcr.microsoft.com/dotnet/sdk:8.0 bash -lc 'dotnet test FCIWeb.CrossPlatform.sln -c Release'`,
+build `/warnaserror`, e se tocca hosting, Docker smoke. Aggiorna PLAN §2, §6, §10, TODO e docs solo
+con evidenze osservate. Gate: `bash scripts/check-secrets.sh`, history gate, zero binari proprietari;
+nessun push; azioni distruttive solo con autorizzazione. Commit solo con gate verdi. Se bloccato,
+formula domanda precisa.
 ```

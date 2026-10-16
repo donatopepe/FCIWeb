@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FCIWeb.Core\FCIWeb.Core.csproj" />
+    <ProjectReference Include="..\FCIWeb.Data\FCIWeb.Data.csproj" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using FCIWeb.Web.Models;
+using StatoRichiesta = FCIWeb.Core.Models.StatoRichiesta;
 
 namespace FCIWeb.Web.Data
 {

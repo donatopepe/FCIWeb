@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using FCIWeb.Core.Utility;
 using Xunit;
 
@@ -55,7 +56,7 @@ namespace FCIWeb.Core.Tests
         [Fact]
         public void TextToDate_TooOld_ReturnsNull()
         {
-            var tooOld = DateTime.Now.AddYears(-121).ToString("dd/MM/yyyy");
+            var tooOld = DateTime.Now.AddYears(-121).ToString("dd/MM/yyyy", CultureInfo.InvariantCulture);
             Assert.Null(_sut.TextToDate(tooOld));
         }
 

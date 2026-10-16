@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FCIWeb.Web.Models;
+using StatoRichiesta = FCIWeb.Core.Models.StatoRichiesta;
 
 namespace FCIWeb.Web.Data
 {

@@ -35,8 +35,12 @@ eseguibili su Linux.
 ```
 FCIWeb.sln                     (legacy .NET Framework — riferimento)
 FCIWeb.CrossPlatform.sln       (nuovo .NET 8 — target)
-  src/FCIWeb.Core              logica di dominio portabile
-  tests/FCIWeb.Core.Tests      test cross-platform (dotnet test)
+  src/FCIWeb.Core              dominio + sicurezza
+  src/FCIWeb.Data              EF Core, SQLite + SQL Server
+  src/FCIWeb.Web               ASP.NET Core MVC + DEMO_MODE
+  tests/FCIWeb.Core.Tests      test unitari di dominio/sicurezza
+  tests/FCIWeb.Data.Tests      integrazione SQLite (persistenza)
+  tests/FCIWeb.Web.Tests       integrazione HTTP
 ```
 
 ## 3. Mappa di conversione
@@ -69,12 +73,15 @@ FCIWeb.CrossPlatform.sln       (nuovo .NET 8 — target)
 | M0 | Scaffold soluzione .NET 8 + CI cross-platform | ✅ |
 | M1 | Porting utility pure (`DateUtil`, `Extensions`, `MapObj`) + test | ✅ (26 test) |
 | M2 | Porting modelli di dominio (entità) senza `System.Web`/`System.Drawing` | ✅ (42 test) |
-| M3 | EF Core context + migrazioni + provider SQLite (demo) e SQL Server | ⏳ |
-| M4 | Web app ASP.NET Core: hosting, routing, auth cookie/Windows, `DEMO_MODE` | ✅ (105 test, container Linux) |
+| M3 | EF Core context + repository; provider SQLite demo e SQL Server disponibile | ✅* | 7 test SQLite; schema via EnsureCreated (migrations EF non ancora versionate) |
+| M4 | Web app ASP.NET Core: hosting, routing, auth cookie, SQLite DEMO_MODE | ✅ (113 test, Docker Linux) |
 | M5 | Porting repository/servizi e adapter per i servizi esterni | ⏳ |
 | M6 | Porting viste Razor a runtime + UI (sostituzione Telerik/Kendo) | ⏳ |
 | M7 | Documenti: sostituzione Office Interop con OpenXml | ⏳ |
 | M8 | Pacchettizzazione Docker (`linux/amd64`, `linux/arm64`) + release | ⏳ |
+
+\* SQLite è backend predefinito ed è testato; provider SQL Server è compilato, non validato con un server.
+  Schema usa `EnsureCreated`; migrazioni EF versionate restano aperte.
 
 ## 5. Definizione di "fatto" per il cross-platform
 

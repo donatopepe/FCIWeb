@@ -1,4 +1,4 @@
-# Contesto di build ridotto per l'immagine Docker della web app .NET 8.
+# Contesto Docker minimo: mantiene solo progetti source e test necessari alla solution.
 .git
 .github
 old
@@ -7,9 +7,11 @@ lib
 packages
 BuildProcessTemplates
 docs
+TODO.md
 **/bin
 **/obj
 **/TestResults
+**/.codegraph
 .pi-loop.json
 .pi-loop.json.lock
 .secrets-denylist

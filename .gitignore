@@ -387,6 +387,9 @@ Da aggiornare sul server.7z
 *.7z
 *.zip.tmp
 
+# CodeGraph index locale (generato, non versionare)
+.codegraph/
+
 # Prompt/loop locali
 .pi-loop.json
 .pi-loop.json.lock

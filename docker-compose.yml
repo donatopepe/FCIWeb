@@ -8,6 +8,8 @@ services:
     image: fciweb-web:local
     ports:
       - "8080:8080"
+    volumes:
+      - fciweb-data:/app/data
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       # Sovrascrivi le credenziali demo (non usare i default in produzione):
@@ -19,3 +21,6 @@ services:
       - /tmp
     security_opt:
       - no-new-privileges:true
+
+volumes:
+  fciweb-data:

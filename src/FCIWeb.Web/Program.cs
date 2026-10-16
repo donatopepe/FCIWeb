@@ -1,6 +1,8 @@
 using System;
 using FCIWeb.Web.Data;
 using FCIWeb.Web.Security;
+using FCIWeb.Data;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -37,11 +39,31 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 
-// Dati in memoria (DEMO_MODE): nessun database richiesto.
-builder.Services.AddSingleton<IRichiestaStore, InMemoryRichiestaStore>();
+// DEMO_MODE: persistente su SQLite per default; impostare FCIWEB_STORE=memory per usare RAM.
+var storeMode = builder.Configuration["FCIWEB_STORE"] ?? "sqlite";
+if (String.Equals(storeMode, "memory", StringComparison.OrdinalIgnoreCase))
+{
+    builder.Services.AddSingleton<IRichiestaStore, InMemoryRichiestaStore>();
+}
+else
+{
+    var databasePath = builder.Configuration["FCIWEB_SQLITE_PATH"] ?? "data/fciweb.db";
+    var databaseDirectory = System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(databasePath));
+    if (!String.IsNullOrEmpty(databaseDirectory)) System.IO.Directory.CreateDirectory(databaseDirectory);
+    builder.Services.AddDbContext<FCIWebContext>(options => options.UseSqlite($"Data Source={databasePath}"));
+    builder.Services.AddScoped<IRichiestaRepository, EfRichiestaRepository>();
+    builder.Services.AddScoped<IRichiestaStore, EfRichiestaStore>();
+}
 builder.Services.AddSingleton<DemoUserStore>();
 
 var app = builder.Build();
+
+if (!String.Equals(storeMode, "memory", StringComparison.OrdinalIgnoreCase))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<FCIWebContext>();
+    db.Database.EnsureCreated();
+}
 
 app.UseSecurityHeaders();
 

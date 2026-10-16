@@ -1,4 +1,5 @@
 @model Richiesta
+@using StatoRichiesta = FCIWeb.Core.Models.StatoRichiesta
 @{
     ViewData["Title"] = "Richiesta " + Model.NDG;
     var transizioni = ViewBag.Transizioni as IReadOnlyList<StatoRichiesta> ?? Array.Empty<StatoRichiesta>();

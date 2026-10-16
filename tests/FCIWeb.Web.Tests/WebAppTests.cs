@@ -14,7 +14,7 @@ namespace FCIWeb.Web.Tests
 
         public WebAppTests(WebApplicationFactory<Program> factory)
         {
-            _factory = factory.WithWebHostBuilder(builder => builder.UseSetting("Demo:Mode", "true"));
+            _factory = factory.WithWebHostBuilder(builder => builder.UseSetting("FCIWEB_STORE", "memory"));
         }
 
         [Fact]
