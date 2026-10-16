@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using AreaCommonWeb.DAL;
 using DAL.AreaCommonWeb;
-using WebServiceModel.WSProfiles;
+// Alias: tipo da assembly proprietario esterno (WebServiceModel.dll), non ridistribuito.
+using UserInfo = WebServiceModel.WSProfiles.UserInfo;
 using WebServiceModel.WSSicurezza;
 
 namespace FCIWeb.Business

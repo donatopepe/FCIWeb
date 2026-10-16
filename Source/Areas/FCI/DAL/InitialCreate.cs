@@ -102,7 +102,7 @@ namespace FCIWeb.Areas.FCI.DAL
 		<td class='desc_cell_c'>
 	      		<TABLE BORDER=0 WIDTH='600' CELLSPACING=5 CELLPADDING=0 align=center> 
 				<tr>
-				<td align='right' colspan='2'><img src='http://www.example.it/app/img/logo_example.gif' width=106 height=57><br><br></td>
+				<td align='right' colspan='2'><img src='http://portal.example.com/img/logo.gif' width=106 height=57><br><br></td>
 				</tr>
                 <tr>
                 <td>

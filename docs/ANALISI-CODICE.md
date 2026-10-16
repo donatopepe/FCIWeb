@@ -1,4 +1,4 @@
-# Analisi del codice — FCIWeb
+﻿# Analisi del codice — FCIWeb
 
 Studio del repository eseguito il 2026-10-16 sul branch `master` (commit `8c2454f`).
 Tutti i numeri sono verificati con comandi shell sul working tree.
@@ -130,7 +130,33 @@ da `AreaCommonWeb`).
 - Utility isolate e testabili (`DateUtil`, `Extensions`, `MapObj`).
 - Localizzazioni già predisposte in `App_GlobalResources`.
 
-## 7. Indicazioni per il risanamento
+## 8. De-branding (2026-10-16)
+
+Rimossi dal repository (working tree **e history**) tutti i riferimenti identificativi
+dell'organizzazione di origine:
+
+- **Loghi dell'istituto**: file immagine eliminati e sostituiti con un `logo.svg` generico "FCIWeb".
+- **Nome azienda**: `Source/Properties/AssemblyInfo.cs` (company/copyright) → `Example Organization`.
+- **URL e domini interni**: portali, SSO, help desk e IP interni → `portal.example.com`.
+- **Dati simulati**: nomi di filiali reali → `UO Nord`, `UO Sud`, ...
+- **Acronimi dell'istituto nei nomi di tipo/proprietà**: le proprietà dei proxy proprietari che
+  contenevano l'acronimo sono state rinominate con nomi neutri (`DescrizioneUO`, `WSProfiles`,
+  `UserInfo`).
+- **Prefissi nei percorsi di build/storage**: neutralizzati (`App.RCD`).
+- **Riferimenti organizzativi nelle view**: testi di reparto/ufficio → generici.
+
+### Nota sui limiti
+
+I nomi rinomati appartenevano ad **assembly proprietari esterni non ridistribuiti**
+(`AreaCommonWeb.dll`, `WebServiceModel.dll`): il codice di questo repository è ora de-brandizzato,
+ma per ricompilarlo contro quegli assembly serve un adattatore (vedi
+[`PORTING-CROSS-PLATFORM.md`](PORTING-CROSS-PLATFORM.md)).
+
+Termini italiani generici di dominio (es. campi "data stop banca" / "giorni attesa banca")
+restano: indicano il processo, non l'istituto, e rinominarli cambierebbe chiavi di configurazione
+e campi di database.
+
+## 9. Indicazioni per il risanamento
 
 1. **Non cancellare**: archiviare `old/` in `legacy/` con un README che spiega le differenze.
 2. **Segreti**: sostituire con `*.sample`; ruotare le credenziali; riscrivere la history.

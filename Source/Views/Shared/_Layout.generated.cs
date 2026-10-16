@@ -533,7 +533,7 @@ WriteLiteral(" alt=\"logo\"");
 WriteAttribute("src", Tuple.Create(" src=\"", 5052), Tuple.Create("\"", 5100)
             
             #line 118 "..\..\Views\Shared\_Layout.cshtml"
-, Tuple.Create(Tuple.Create("", 5058), Tuple.Create<System.Object, System.Int32>(Url.Content("~/Content/img/logo.gif")
+, Tuple.Create(Tuple.Create("", 5058), Tuple.Create<System.Object, System.Int32>(Url.Content("~/Content/img/logo.svg")
             
             #line default
             #line hidden
@@ -634,8 +634,7 @@ WriteLiteral(">\r\n      <div");
 
 WriteLiteral(" class=\"moduletable-address\"");
 
-WriteLiteral(">\r\n        <h3>IT Operations</h3>\r\n        Powered by the FCIWeb project" +
-"rmativi\r\n      </div>\r\n      <div");
+WriteLiteral(">\r\n        <h3>IT Operations</h3>\r\n        Powered by the FCIWeb project\r\n      </div>\r\n      <div");
 
 WriteLiteral(" class=\"moduletable-contact\"");
 
@@ -647,7 +646,7 @@ WriteLiteral(">\r\n        <h3>Informazioni di supporto </h3>\r\n\r\n        <a"
 
 WriteLiteral(" target=\"_blank\"");
 
-WriteLiteral(" href=\"http://gruppo.example.it/webapps/redirect.aspx?url=http://portal.example.com/get" +
+WriteLiteral(" href=\"http://portal.example.com/webapps/redirect.aspx?url=http://portal.example.com/get" +
 "userinfo/GetUserInfo.asp?UrlRedirect=http://portal.example.com/Portal/portale/port" +
 "ale.asp\"");
 

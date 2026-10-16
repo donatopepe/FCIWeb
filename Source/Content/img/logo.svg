@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logo generico del progetto FCIWeb (nessun marchio di terze parti). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="106" height="57" viewBox="0 0 106 57" role="img" aria-label="FCIWeb">
+  <rect width="106" height="57" rx="6" fill="#8c1c1c"/>
+  <text x="53" y="34" font-family="Segoe UI, Arial, sans-serif" font-size="20"
+        font-weight="600" fill="#ffffff" text-anchor="middle">FCIWeb</text>
+</svg>

@@ -33,8 +33,8 @@ namespace FCIWeb.Areas.FCI.Uility
         private MemoryStream file_memoria;
         private Richieste richesta;
         //private string fullpath = @"C:\\Sviluppo\\";
-        private string fullpath = @"//FILESERVER/ApplicazioniMvc/WebPortal_ns/Doc_Files/FCI/";
-        private string filetemp = @"//FILESERVER/ApplicazioniMvc/WebPortal_ns/Doc_Files/FCI/temp/";
+        private string fullpath = @"//FILESERVER/ApplicazioniMvc/WebPortal/Doc_Files/FCI/";
+        private string filetemp = @"//FILESERVER/ApplicazioniMvc/WebPortal/Doc_Files/FCI/temp/";
 
         public  void OpenAndAddTextToWordDocument(string filepath, string txt)
         {

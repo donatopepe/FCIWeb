@@ -55,12 +55,12 @@ namespace FCIWeb.Areas.FCI.Controllers
         {
             //IQueryable<DimUO> filiali = commonBusiness.getUoByText(prefix).Where(a => a.FlagUfficioFiliale == "F" || a.FlagUfficioFiliale == "O");
             var filiali = new List<DimUO> {
-                new DimUO { DescrizioneUO="Bari", UOCode="435678"},
-                new DimUO { DescrizioneUO="Taranto", UOCode="55533"},
-                new DimUO { DescrizioneUO="Foggia", UOCode="3534553"},
-                new DimUO { DescrizioneUO="Brindisi", UOCode="54333"},
-                new DimUO { DescrizioneUO="Roma", UOCode="6666666"},
-                new DimUO { DescrizioneUO="Milano", UOCode="4444444"},
+                new DimUO { DescrizioneUO="UO Nord", UOCode="435678"},
+                new DimUO { DescrizioneUO="UO Sud", UOCode="55533"},
+                new DimUO { DescrizioneUO="UO Est", UOCode="3534553"},
+                new DimUO { DescrizioneUO="UO Ovest", UOCode="54333"},
+                new DimUO { DescrizioneUO="UO Centro", UOCode="6666666"},
+                new DimUO { DescrizioneUO="UO Nord Ovest", UOCode="4444444"},
             };
             return Json(filiali, JsonRequestBehavior.AllowGet);
         }
@@ -178,12 +178,12 @@ namespace FCIWeb.Areas.FCI.Controllers
         {
             //IQueryable<DimUO> listaUnita = commonBusiness.getUoByText(text);
             var listaUnita = new List<DimUO> {
-                    new DimUO { DescrizioneUO="Bari", UOCode="435678"},
-                    new DimUO { DescrizioneUO="Taranto", UOCode="55533"},
-                    new DimUO { DescrizioneUO="Foggia", UOCode="3534553"},
-                    new DimUO { DescrizioneUO="Brindisi", UOCode="54333"},
-                    new DimUO { DescrizioneUO="Roma", UOCode="6666666"},
-                    new DimUO { DescrizioneUO="Milano", UOCode="4444444"},
+                    new DimUO { DescrizioneUO="UO Nord", UOCode="435678"},
+                    new DimUO { DescrizioneUO="UO Sud", UOCode="55533"},
+                    new DimUO { DescrizioneUO="UO Est", UOCode="3534553"},
+                    new DimUO { DescrizioneUO="UO Ovest", UOCode="54333"},
+                    new DimUO { DescrizioneUO="UO Centro", UOCode="6666666"},
+                    new DimUO { DescrizioneUO="UO Nord Ovest", UOCode="4444444"},
                 };
             return Json(listaUnita);
         }

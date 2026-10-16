@@ -27,9 +27,9 @@ namespace RCDWeb.Areas.RCD.Uility
         
 
         private Richieste richesta;
-        //private string fullpath = "d:\\ApplicazioniMvc\\WebPortal_ns\\Doc_Files\\RCD\\";
-        private string fullpath = @"//FILESERVER/ApplicazioniMvc/WebPortal_ns/Doc_Files/RCD/";
-        private string filetemp = @"//FILESERVER/ApplicazioniMvc/WebPortal_ns/Doc_Files/RCD/temp/";
+        //private string fullpath = "d:\\ApplicazioniMvc\\WebPortal\\Doc_Files\\RCD\\";
+        private string fullpath = @"//FILESERVER/ApplicazioniMvc/WebPortal/Doc_Files/RCD/";
+        private string filetemp = @"//FILESERVER/ApplicazioniMvc/WebPortal/Doc_Files/RCD/temp/";
 
         public StampaDocumenti(Richieste richiesta)
         {
@@ -158,16 +158,16 @@ namespace RCDWeb.Areas.RCD.Uility
                 ErrorSignal.FromCurrentContext().Raise(ex);
 
 
-                //string pippo = @"\\FILESERVER\ApplicazioniMvc\WebPortal_ns\Doc_Files\RCD\";
+                //string pippo = @"\\FILESERVER\ApplicazioniMvc\WebPortal\Doc_Files\RCD\";
                 // ex = new Exception("File: >>>>>>>>>>>>  " + pippo + ":" + File.Exists(pippo + nomefile));
                 //ErrorSignal.FromCurrentContext().Raise(ex);
-                //pippo = @"\\\FILESERVER\\ApplicazioniMvc\\WebPortal_ns\\Doc_Files\\RCD\\";
+                //pippo = @"\\\FILESERVER\\ApplicazioniMvc\\WebPortal\\Doc_Files\\RCD\\";
                 //ex = new Exception("File: >>>>>>>>>>>>  " + pippo + ":" + File.Exists(pippo + nomefile));
                 //ErrorSignal.FromCurrentContext().Raise(ex);
-                //pippo = @"c:\ApplicazioniMvc\WebPortal_ns\Doc_Files\RCD\";
+                //pippo = @"c:\ApplicazioniMvc\WebPortal\Doc_Files\RCD\";
                 // ex = new Exception("File: >>>>>>>>>>>>  " + pippo + ":" + File.Exists(pippo + nomefile));
                 //ErrorSignal.FromCurrentContext().Raise(ex);
-                //pippo = @"d:\ApplicazioniMvc\WebPortal_ns\Doc_Files\RCD\";
+                //pippo = @"d:\ApplicazioniMvc\WebPortal\Doc_Files\RCD\";
                 // ex = new Exception("File: >>>>>>>>>>>>  " + pippo + ":" + File.Exists(pippo + nomefile));
                 //ErrorSignal.FromCurrentContext().Raise(ex);
 

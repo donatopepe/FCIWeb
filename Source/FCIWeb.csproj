@@ -2546,8 +2546,7 @@
     <Content Include="Content\img\loading\loading48.gif" />
     <Content Include="Content\img\loading\loading9.gif" />
     <Content Include="Content\img\LogIcon.png" />
-    <Content Include="Content\img\logo.gif" />
-    <Content Include="Content\img\logo.jpg" />
+    <Content Include="Content\img\logo.svg" />
     <Content Include="Content\img\menu_bg.jpg" />
     <Content Include="Content\img\menu_li_bg.jpg" />
     <Content Include="Content\img\path_arrow_bg.jpg" />

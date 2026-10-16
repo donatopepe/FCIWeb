@@ -1,4 +1,4 @@
-# FCIWeb
+﻿# FCIWeb
 
 Applicazione **ASP.NET MVC 4 / .NET Framework** per la gestione intranet di *Richieste* e *Fogli*
 strutturati: flusso a stati, allegati, documenti Word/Excel, notifiche email, profili di

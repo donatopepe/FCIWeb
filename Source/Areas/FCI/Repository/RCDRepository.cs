@@ -590,7 +590,7 @@ namespace FCIWeb.Areas.FCI.Repository
                 //string fullUrl = "";
                 string host = HttpContext.Current.Request.Url.Host;
                 string nomePortale = ConfigurationManager.AppSettings["NomePortale"];
-                string hostName = @"http://gruppo.example.it/Webapps/Portal/WKS_SSO.aspx?url=http://" + host + nomePortale;
+                string hostName = @"http://portal.example.com/webapps/portal/sso.aspx?url=http://" + host + nomePortale;
                 string fullUrl = hostName + @"/FCI/Richiesta/GestioneRichieste/" + richiestedb.Id;
                 //fullUrl = this.Url.Action("GestioneRichieste", "Richiesta", new { }, this.Request.Url.Scheme);
                 var oggetto = emailtesto.Oggetto;

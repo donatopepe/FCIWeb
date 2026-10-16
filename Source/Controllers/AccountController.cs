@@ -16,6 +16,9 @@ using FCIWeb.Areas.FCI;
 using FCIWeb.Business;
 using WebServiceModel.WSSicurezza;
 using DAL.AreaCommonWeb;
+// Alias: tipo proveniente da un assembly proprietario esterno (WebServiceModel.dll),
+// non ridistribuito. L'alias evita di ripetere il nome del proxy nel codice.
+using WSProfiles = WSProfiles;
 using AreaCommonWeb.DAL;
 
 namespace FCIWeb.Controllers
@@ -57,10 +60,10 @@ namespace FCIWeb.Controllers
         var Utenza = wsSicurezza.GetUtenzaById(Int32.Parse(IdUtenza));
         CreaCookieUtenza(Utenza);
 
-        WebServiceModel.WSProfiles.Service wsProfiles = new WebServiceModel.WSProfiles.Service();
+        WSProfiles.Service wsProfiles = new WSProfiles.Service();
         GenericHelpers.SetWebServiceURL(wsProfiles);
 
-        WebServiceModel.WSProfiles.UserInfo Utente = wsProfiles.GetUserInfo(username);
+        WSProfiles.UserInfo Utente = wsProfiles.GetUserInfo(username);
         CreaCookieUtente(Utente);
 
         var funzRuolo = wsSicurezza.GetFunzSottoFunz(Utenza.CodRuolo, this.CodApp).ToList();
@@ -148,8 +151,8 @@ namespace FCIWeb.Controllers
         {
           username = "KO" + matricola;
         }
-        WebServiceModel.WSProfiles.UserInfo Utente = new WebServiceModel.WSProfiles.UserInfo();
-        WebServiceModel.WSProfiles.Service wsProfiles = new WebServiceModel.WSProfiles.Service();
+        WSProfiles.UserInfo Utente = new WSProfiles.UserInfo();
+        WSProfiles.Service wsProfiles = new WSProfiles.Service();
         GenericHelpers.SetWebServiceURL(wsProfiles);
         Utente = wsProfiles.GetUserInfo(username);
 
@@ -263,9 +266,9 @@ namespace FCIWeb.Controllers
       {
         string username = "";
         username = User.Identity.Name;
-        WebServiceModel.WSProfiles.UserInfo Utente = new WebServiceModel.WSProfiles.UserInfo();
+        WSProfiles.UserInfo Utente = new WSProfiles.UserInfo();
         username = !String.IsNullOrEmpty(ConfigurationManager.AppSettings["UtenzaTest"].ToString()) ? ConfigurationManager.AppSettings["UtenzaTest"].ToString() : username;
-        WebServiceModel.WSProfiles.Service wsProfiles = new WebServiceModel.WSProfiles.Service();
+        WSProfiles.Service wsProfiles = new WSProfiles.Service();
         GenericHelpers.SetWebServiceURL(wsProfiles);
         Utente = wsProfiles.GetUserInfo(username);
 
@@ -405,7 +408,7 @@ namespace FCIWeb.Controllers
       ProfileAugmentation.Doit();
     }
 
-    public void CreaCookieUtente(WebServiceModel.WSProfiles.UserInfo utente)
+    public void CreaCookieUtente(WSProfiles.UserInfo utente)
     {
 
       UserProfile myProfile = new UserProfileManager().GetCurrent();

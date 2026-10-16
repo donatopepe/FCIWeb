@@ -1,4 +1,4 @@
-# Guida completa — FCIWeb
+﻿# Guida completa — FCIWeb
 
 Guida operativa per installare, configurare, avviare, distribuire e diagnosticare FCIWeb.
 Riferimenti: [`README.md`](../README.md), [`docs/ANALISI-CODICE.md`](ANALISI-CODICE.md),
