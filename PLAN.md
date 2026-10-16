@@ -145,6 +145,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 2 | 2026-10-16 | Rimozione segreti (tree+history), esclusione dipendenze proprietarie | ✅ | filter-repo ×2, `git grep` su storia = 0, `.git` 3 MB |
 | 3 | 2026-10-16 | Avvio cross-platform: soluzione .NET 8, utility portate, 26 test, CI, doc porting | ✅ | `dotnet test` → 26/26 in Docker Linux |
 | 4 | 2026-10-16 | Pubblicazione repo pubblico pulito + CI verde | ✅ | [run 38876403094](https://github.com/donatopepe/FCIWeb/actions/runs/38876403094): validate ✅, crossplatform ✅, legacy ⚠️ |
+| 5 | 2026-10-16 | De-branding completo: nessun riferimento all'azienda (testi, acronimi, loghi, URL) in tree e history | ✅ | clone fresco: 0 hit; `logo.svg` generico; gate storia OK |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -174,6 +175,24 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
   backup locale in `/root/fciweb-remote-backup.git`.
 - Verifica su **clone fresco**: 0 hit di segreti nella history, 0 binari tracciati, working tree pulito.
 - CI: primo run verde (validazione statica + cross-platform).
+
+### Dettaglio ciclo 5 (de-branding)
+
+- Rimossi **loghi dell'istituto** (`logo.gif/.jpg`) da working tree e history; aggiunto
+  `Source/Content/img/logo.svg` generico "FCIWeb".
+- `AssemblyInfo.cs`: company/copyright → `Example Organization`.
+- Neutralizzati: URL/domini interni, SSO, help desk, IP `172.28.166.x`, portali.
+- Rinominati identificatori con acronimo aziendale: `DescrizioneUO`→`DescrizioneUO`,
+  `WSProfiles`→`WSProfiles`, `wsProfiles`→`wsProfiles`.
+- Genericizzati testi di reparto e prefissi di build/storage; dati simulati (filiali) e view.
+- History riscritta con `git-filter-repo --replace-text` (+ regex per stringhe spezzate dal
+  code-gen) e `--invert-paths` sui loghi; repository GitHub **cancellato e ricreato** per eliminare
+  gli oggetti orfani.
+- **Verifica su clone fresco**: 0 hit per 21 token azienda/segreti, nessun logo tracciato, working
+  tree pulito.
+- Limite dichiarato: termini italiani generici di dominio ("data stop banca", "giorni attesa
+  banca") restano perché indicano il processo, non l'istituto (rinominarli cambierebbe chiavi di
+  configurazione e campi DB).
 
 ## 11. Stato pubblicazione
 
