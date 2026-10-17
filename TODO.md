@@ -16,6 +16,12 @@ Aggiungere paging server-side all'elenco Richieste per evitare di materializzare
 - M4 web MVC e M3 repository EF/in-memory presenti.
 - Nessuna nuova dipendenza.
 
+## Security hardening ciclo 14
+- [x] Lockout login per username+IP (5 failure/10 min, lock 15 min), time provider controllabile.
+- [x] Test lockout, sblocco, returnUrl esterno, cookie Secure/HttpOnly/SameSite e HSTS.
+- [x] Suite finale ciclo 14: Core 96, Data 15, Web 15 = 126 PASS; build `/warnaserror` 0/0; Docker smoke HTTP 200.
+- [ ] Migrare lockout storage a backend distribuito prima di deployment multi-instance.
+
 ## Task
 - [x] Aggiungere result paging e API su store/repository.
 - [x] Implementare query paginata in EF (count + Skip/Take server-side) e store demo.

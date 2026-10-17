@@ -61,6 +61,10 @@ L'output deve essere vuoto (o contenere solo placeholder).
 
 ## Controlli implementati (stack cross-platform .NET 8)
 
+Login applica inoltre lockout progressivo per coppia username/IP: default 5 errori in 10 minuti, lockout
+15 minuti. Lo stato è in memoria del processo (single instance); deployment multi-instance richiede
+rate limiting distribuito/reverse-proxy e validazione configurazione.
+
 | Controllo | Dove | Evidenza |
 |-----------|------|----------|
 | Validazione content-type null-safe | `SecurityGuards.IsJsonContentType` | test unitari |
@@ -69,7 +73,10 @@ L'output deve essere vuoto (o contenere solo placeholder).
 | Difesa path traversal (drive/UNC/POSIX) | `SecurityGuards.IsSafeRelativePath`/`CombineUnderRoot` | test unitari |
 | Mascheramento segreti nei log | `SecretRedactor` | test unitari |
 | Validazione configurazione SMTP | `SecureSmtpValidator` | test unitari |
-| Header di sicurezza + CSP | `SecurityHeadersExtensions` | test integrazione |
+| Header CSP/HSTS, anti-frame, nosniff, referrer | `SecurityHeadersExtensions` | test integrazione |
+| Login lockout per account+IP | `LoginAbuseGuard` (per-process) | test integrazione con clock controllabile |
+| ReturnUrl anti-open-redirect | `AccountController.Login` | test URL esterno |
+| Cookie Secure/HttpOnly/SameSite | `Program.cs` | test Set-Cookie |
 | Antiforgery su tutte le POST | `AutoValidateAntiforgeryTokenAttribute` | test integrazione (400 senza token) |
 | Password con PBKDF2-SHA256 (100k iterazioni) | `DemoUserStore` | revisione codice |
 | Autorizzazione per ruolo | `RichiesteController.Delete` (`[Authorize(Roles="admin")]`) | verifica empirica (accesso negato) |

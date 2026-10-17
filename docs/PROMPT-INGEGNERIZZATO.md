@@ -122,7 +122,8 @@ cambiamento in src/tests; verifica Linux con `docker run --rm -v /home/public/FC
 /src mcr.microsoft.com/dotnet/sdk:8.0 bash -lc 'dotnet test FCIWeb.CrossPlatform.sln -c Release'`,
 build `/warnaserror`, e Docker smoke se hosting/DB cambia. Aggiorna PLAN §2, §6, §10, TODO e docs
 solo con evidenze. UI paging o risultati tabellari vanno paginati lato query e coperti da test pagina,
-filtro, empty state e bounds. Gate: secret/history checks, zero binari proprietari, nessun push, nessuna azione
+filtro, empty state e bounds. Security web changes devono avere integration tests su cookie flags,
+returnUrl e limiti login; esplicitare se throttling è per-process o distribuito. Gate: secret/history checks, zero binari proprietari, nessun push, nessuna azione
 distruttiva senza owner. Per provider DB, distinguere generation script design-time da SQL Server live.
 Commit solo con gate verdi. Se bloccato, formula domanda precisa.
 ```

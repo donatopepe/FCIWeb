@@ -18,14 +18,19 @@ namespace FCIWeb.Web.Tests
             return factory.CreateClient(new WebApplicationFactoryClientOptions
             {
                 AllowAutoRedirect = false,
-                HandleCookies = true
+                HandleCookies = true,
+                BaseAddress = new System.Uri("https://localhost")
             });
         }
 
         /// <summary>Esegue il login e restituisce la risposta (302 in caso di successo).</summary>
-        public static async Task<HttpResponseMessage> LoginAsync(HttpClient client, string username, string password)
+        public static Task<HttpResponseMessage> LoginAsync(HttpClient client, string username, string password)
+            => LoginAsync(client, username, password, null);
+
+        public static async Task<HttpResponseMessage> LoginAsync(HttpClient client, string username, string password, string returnUrl)
         {
-            var token = await GetAntiforgeryTokenAsync(client, "/Account/Login");
+            var url = "/Account/Login" + (String.IsNullOrEmpty(returnUrl) ? String.Empty : "?returnUrl=" + Uri.EscapeDataString(returnUrl));
+            var token = await GetAntiforgeryTokenAsync(client, url);
             var content = new FormUrlEncodedContent(new[]
             {
                 new System.Collections.Generic.KeyValuePair<string, string>("Username", username),

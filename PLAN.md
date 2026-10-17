@@ -31,13 +31,13 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 9 | `PLAN.md` | ✅ | questo file |
 | 10 | `docs/PROMPT-INGEGNERIZZATO.md` | ✅ | file |
 | 11 | CI verde: validazione statica | ✅ | run GitHub `38876403094` job "Validazione statica" → success |
-| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 123/123; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
+| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 126/126; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
 | 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 13**: **16/16 = 1.00** per rubrica pubblicabilità; la copertura funzionale prosegue. Le migrations SQLite sono testate; SQL Server end-to-end non è ancora verificato.
+**Misurato al ciclo 14**: **16/16 = 1.00** per rubrica pubblicabilità; la copertura funzionale prosegue. Le migrations SQLite sono testate; SQL Server end-to-end non è ancora verificato.
 
 ## 3. Fatti verificati
 
@@ -152,6 +152,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 11 | 2026-10-16 | Test HTTP stale token con SQLite persistente e richiesta nuova | ✅* | suite 118/118; build /warnaserror 0/0; nessun push |
 | 12 | 2026-10-16 | Test generation migration script SQL Server idempotente senza connessione live | ✅* | test Data 12/12, suite 119/119; build /warnaserror 0/0 |
 | 13 | 2026-10-16 | M6 partial: paging SQL server-side richieste e navigazione Razor | ✅* | 3 test repository + 1 web; suite 123/123; Compose login 200 |
+| 14 | 2026-10-16 | Cybersecurity login hardening: lockout, returnUrl, cookie Secure/HSTS tests | ✅* | 3 test hardening; full suite 126/126; build warn-as-error 0/0 |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -323,6 +324,38 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Verifica Linux: Core 96 + Data 15 + Web 12 = **123/123**; build `/warnaserror` zero warning/errori.
 - Docker Compose smoke login 200, down OK. Nessun push.
 - Limite: M6 copre solo elenco Richieste, non viste legacy o allegati/documenti.
+
+### Dettaglio ciclo 14 (security hardening web)
+
+- `LoginAbuseGuard` usa conteggio atomico sotto lock per account+IP, finestra 10 min e lockout 15 min
+  dopo 5 errori; rate controls configurabili, test usa `TimeProvider` deterministico.
+- Account controller rifiuta login durante lock, registra fallimenti e resetta contatore su login valido.
+- Cookie authentication impostata `SecurePolicy.Always`, `HttpOnly`, `SameSite=Lax`; aggiunto HSTS
+  header e test di verifica cookie/headers; returnUrl esterno testato come non rediretto.
+- Suite Linux: Core 96 + Data 15 + Web 15 = **126/126**; build `/warnaserror` 0 warning/errori.
+- Limite operativo: lockout storage process-local; deployment multi-instance richiede store distribuito,
+  proxy rate limiting e policy operativa. Non dichiarato production-ready multi-node.
+
+### Dettaglio ciclo 14 (hardening cybersecurity)
+
+- Lockout login per username+IP: 5 errori in 10 min → blocco 15 min; chiavi username hashate,
+  numero massimo di chiavi limitato; `TimeProvider` rende expiry testabile.
+- ReturnUrl esterno non usato per redirect dopo login (test dedicato).
+- Cookie auth `SecurePolicy.Always`, `HttpOnly`, `SameSite=Lax`; HSTS header testato.
+- 3 hardening test; suite Linux Core 96 + Data 15 + Web 15 = **126/126**; build `/warnaserror` 0/0.
+- Limite: lockout in memoria per processo; deployment multi-instance richiede backend distribuito/
+  rate limiting proxy e va configurato prima di esposizione pubblica.
+
+### Dettaglio ciclo 14 (hardening cybersecurity)
+
+- `LoginAbuseGuard`: lockout per account+IP, default 5 errori/10 min e lock 15 min; keys username hashate,
+  limite key count e time provider testabile. Failure/lock/reset implementati.
+- Login rifiuta account lockati, record failure e reset al successo; `returnUrl` esterno respinto dal redirect.
+- Cookie `SecurePolicy.Always`, `HttpOnly`, `SameSite=Lax`; HSTS e security headers verificati.
+- Test integrazione: lockout + expiry, open redirect e cookie flags/HSTS.
+- Test finale Linux: Core 96 + Data 15 + Web 15 = **126/126**; build `/warnaserror` 0/0.
+- Compose smoke Docker: HTTP login 200, compose down clean.
+- Limite: limiter lockout risiede in process memory; multi-replica richiede backend condiviso e rate-limit proxy.
 
 ## 11. Stato pubblicazione
 

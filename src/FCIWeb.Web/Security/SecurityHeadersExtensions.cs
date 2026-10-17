@@ -24,6 +24,7 @@ namespace FCIWeb.Web.Security
             return app.Use(async (context, next) =>
             {
                 var headers = context.Response.Headers;
+                headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains";
                 headers["X-Content-Type-Options"] = "nosniff";
                 headers["X-Frame-Options"] = "DENY";
                 headers["Referrer-Policy"] = "no-referrer";

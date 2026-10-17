@@ -33,11 +33,14 @@ builder.Services
         options.Cookie.Name = "fciweb.demo";
         options.Cookie.HttpOnly = true;
         options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.SlidingExpiration = true;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
     });
 builder.Services.AddAuthorization();
+builder.Services.Configure<LoginAbuseOptions>(builder.Configuration.GetSection("Security:LoginAbuse"));
+builder.Services.AddSingleton<TimeProvider>(TimeProvider.System);
+builder.Services.AddSingleton<LoginAbuseGuard>();
 
 // DEMO_MODE: persistente su SQLite per default; impostare FCIWEB_STORE=memory per usare RAM.
 var storeMode = builder.Configuration["FCIWEB_STORE"] ?? "sqlite";

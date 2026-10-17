@@ -36,13 +36,15 @@ Cosa puoi fare: autenticarti, sfogliare le richieste con paginazione server-side
 search preservata), cercare, crearne una, cambiarne lo stato (transizioni validate), eliminarla
 (solo admin).
 
-Sicurezza già attiva: header di sicurezza + CSP, antiforgery su tutte le POST, password verificate
-con PBKDF2-SHA256, autorizzazione per ruolo, container non-root, nessun header `Server`.
+Sicurezza già attiva: header di sicurezza + CSP/HSTS, antiforgery su tutte le POST, password verificate
+con PBKDF2-SHA256, login lockout (per-process), returnUrl esterno respinto, cookie Secure/HttpOnly/SameSite,
+autorizzazione per ruolo, container non-root, nessun header `Server`. Multi-instance richiede
+rate-limit/lockout distribuito.
 
 Test:
 
 ```bash
-dotnet test FCIWeb.CrossPlatform.sln -c Release   # 123 test
+dotnet test FCIWeb.CrossPlatform.sln -c Release   # 126 test
 ```
 
 Stato: `src/FCIWeb.Core` (dominio + sicurezza), `src/FCIWeb.Data` (EF Core) e `src/FCIWeb.Web`
