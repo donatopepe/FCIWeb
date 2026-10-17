@@ -74,6 +74,31 @@ namespace FCIWeb.Web.Tests
         }
 
         [Fact]
+        public async Task RichiestePaging_SearchReturnsFilteredPageAndNavigationLinks()
+        {
+            using var client = TestClient.Create(_factory);
+            await TestClient.LoginAsync(client, "user", "User123!");
+            var page1 = await client.GetAsync("/Richieste?page=1&pageSize=2");
+            Assert.Equal(HttpStatusCode.OK, page1.StatusCode);
+            var html1 = await page1.Content.ReadAsStringAsync();
+            Assert.Contains("Pagina 1 di 3", html1);
+            Assert.Contains("Successiva", html1);
+            Assert.DoesNotContain("Precedente", html1);
+
+            var page2 = await client.GetAsync("/Richieste?page=2&pageSize=2");
+            var html2 = await page2.Content.ReadAsStringAsync();
+            Assert.Contains("Pagina 2 di 3", html2);
+            Assert.Contains("Precedente", html2);
+            Assert.Contains("Successiva", html2);
+
+            var filtered = await client.GetAsync("/Richieste?q=1001&page=2&pageSize=2");
+            var filteredHtml = await filtered.Content.ReadAsStringAsync();
+            Assert.Contains("Pagina 1 di 1", filteredHtml);
+            Assert.Contains("1001", filteredHtml);
+            Assert.DoesNotContain("1002", filteredHtml);
+        }
+
+        [Fact]
         public async Task StaleVersion_ChangeState_IsRejectedWithoutOverwritingFirstUpdate()
         {
             using var client = TestClient.Create(_factory);

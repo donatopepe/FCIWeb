@@ -22,6 +22,16 @@ namespace FCIWeb.Web.Data
             return result;
         }
 
+        public PagedResult<FCIWeb.Web.Models.Richiesta> GetPage(string query, int pageNumber, int pageSize)
+        {
+            var page = _repository.GetPage(query, pageNumber, Math.Clamp(pageSize, 1, 50));
+            var items = new List<FCIWeb.Web.Models.Richiesta>(page.Items.Count);
+            foreach (var r in page.Items) items.Add(ToWeb(r));
+            var totalPages = page.TotalCount == 0 ? 0 : (int)Math.Ceiling(page.TotalCount / (double)Math.Clamp(pageSize, 1, 50));
+            var normalizedPage = totalPages == 0 ? 1 : Math.Min(Math.Max(1, pageNumber), totalPages);
+            return new PagedResult<FCIWeb.Web.Models.Richiesta>(items, normalizedPage, Math.Clamp(pageSize, 1, 50), page.TotalCount);
+        }
+
         public FCIWeb.Web.Models.Richiesta GetById(Guid id)
         {
             var result = _repository.GetById(id);

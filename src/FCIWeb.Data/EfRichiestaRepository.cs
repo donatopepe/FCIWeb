@@ -28,6 +28,26 @@ namespace FCIWeb.Data
             return richieste.OrderByDescending(r => r.DataCreazione).ToList();
         }
 
+        public (IReadOnlyList<Richiesta> Items, int TotalCount) GetPage(string query, int pageNumber, int pageSize)
+        {
+            var safePageSize = Math.Clamp(pageSize, 1, 50);
+            var safePage = Math.Max(1, pageNumber);
+            IQueryable<Richiesta> filtered = _db.Richieste.AsNoTracking();
+            if (!String.IsNullOrWhiteSpace(query))
+            {
+                var q = query.Trim();
+                filtered = filtered.Where(r => r.NDG.Contains(q) || r.Intestazione.Contains(q) ||
+                                               (r.UOCode != null && r.UOCode.Contains(q)));
+            }
+
+            var total = filtered.Count();
+            var totalPages = total == 0 ? 0 : (int)Math.Ceiling(total / (double)safePageSize);
+            if (totalPages > 0) safePage = Math.Min(safePage, totalPages);
+            var items = filtered.OrderByDescending(r => r.DataCreazione).ThenBy(r => r.Id)
+                .Skip((safePage - 1) * safePageSize).Take(safePageSize).ToList();
+            return (items, total);
+        }
+
         public Richiesta GetById(Guid id) => _db.Richieste.AsNoTracking().SingleOrDefault(r => r.Id == id);
 
         public Richiesta Add(Richiesta richiesta)

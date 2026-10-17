@@ -32,8 +32,9 @@ docker run --rm -p 8080:8080 fciweb-web:local
 **Credenziali demo** (solo locali, sovrascrivibili con `Demo:Users`):
 `admin / Admin123!` (ruolo admin) — `user / User123!` (ruolo user).
 
-Cosa puoi fare: autenticarti, sfogliare e cercare le richieste, crearne una, cambiarne lo stato
-(flusso a stati con transizioni validate), eliminarla (solo admin).
+Cosa puoi fare: autenticarti, sfogliare le richieste con paginazione server-side (10 per pagina,
+search preservata), cercare, crearne una, cambiarne lo stato (transizioni validate), eliminarla
+(solo admin).
 
 Sicurezza già attiva: header di sicurezza + CSP, antiforgery su tutte le POST, password verificate
 con PBKDF2-SHA256, autorizzazione per ruolo, container non-root, nessun header `Server`.
@@ -41,7 +42,7 @@ con PBKDF2-SHA256, autorizzazione per ruolo, container non-root, nessun header `
 Test:
 
 ```bash
-dotnet test FCIWeb.CrossPlatform.sln -c Release   # 119 test
+dotnet test FCIWeb.CrossPlatform.sln -c Release   # 123 test
 ```
 
 Stato: `src/FCIWeb.Core` (dominio + sicurezza), `src/FCIWeb.Data` (EF Core) e `src/FCIWeb.Web`

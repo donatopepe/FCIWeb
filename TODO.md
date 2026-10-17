@@ -1,50 +1,26 @@
-# TODO — Follow-up porting M3/M5–M8
+# TODO — M6 list paging e UI cross-platform
 
-## Obiettivo corrente
-M3 migrations SQLite realizzate e testate; proseguire verifiche provider/porting use-case senza
-attribuire esito SQL Server non osservato.
+## Obiettivo del ciclo
+Aggiungere paging server-side all'elenco Richieste per evitare di materializzare l'intero archivio e rendere la lista utilizzabile con dataset crescenti.
 
-## Metrica + soglia del ciclo migration
-Tasso casi migration superati = passati/totali; soglia **100%** sui test SQLite; build
-`/warnaserror` a zero warning/errori.
+## Metrica + soglia
+**Tasso test scenari paging passati** = test paging passati / test paging totali. Soglia **100%**; suite completa verde e build `/warnaserror` senza warning/errori.
 
-## Casi verificati
-1. Database SQLite vuoto: `Migrate()` crea schema/table.
-2. Secondo `Migrate()` idempotente.
-3. Insert dopo migration e lettura dopo nuovo contesto; record preservato.
-4. Repository CRUD/transizioni: coperti da test SQLite separati.
+## Scenari definiti prima dell'implementazione (ordine)
+1. Pagina 1 e pagina 2, ordinamento deterministico e nessun record duplicato.
+2. Ricerca testuale: filtro applicato prima di count e paging.
+3. Page fuori range/zero e page size invalidi: normalizzazione e limite massimo 50.
+4. Elenco vuoto: count 0, page corrente 1, pages 0.
 
-## M3 completato
-- [x] Tool `dotnet-ef` pinned a 8.0.11 in `.config/dotnet-tools.json`.
-- [x] `IDesignTimeDbContextFactory<FCIWebContext>`: SQLite default; SQL Server soltanto se provider e connection env sono configurati.
-- [x] Migration iniziale `InitialCreate` + snapshot.
-- [x] Bootstrap runtime `Database.Migrate()`.
-- [x] Adottare database pregresso `EnsureCreated` senza perdita record: verifica colonne e registra migration iniziale; test dedicato.
-- [x] Fixture SQLite usa migrazioni; test migrazione idempotente/data retention.
-- [x] Build Docker include progetto Data.
-- [x] Suite Linux (ciclo 12): Core 96, Data 12, Web 11 = 119 test.
-- [x] Build Release `/warnaserror`: zero warning/errori (con restore precedentemente eseguito).
+## Dipendenze
+- M4 web MVC e M3 repository EF/in-memory presenti.
+- Nessuna nuova dipendenza.
 
-## M5 partial — concorrenza applicativa completata su SQLite
-- [x] Version token GUID application-managed in entity e migration.
-- [x] Compare-and-swap transizione su ID + expected version.
-- [x] Test two-context stale write rifiutato e dati aggiornati preservati.
-- [x] Test HTTP end-to-end (ciclo 10) invia due volte lo stesso version token; secondo cambio non sovrascrive il primo.
-- [x] Test HTTP end-to-end (ciclo 11) crea richiesta nuova e verifica transition stale token non sovrascrive aggiornamento.
-- [ ] Ripetere test su SQL Server reale/disposable autorizzato.
-
-## M3 SQL Server provider verification
-- [x] Generare script migration SQL Server idempotente senza connessione; test assert DDL/history/index/separatore batch.
-- [x] Suite Linux: Core 96 + Data 12 + Web 11 = 119 test; build warn-as-error clean.
-- [ ] Applicare script a SQL Server disposable autorizzato; provider runtime resta non verificato.
-
-## Prossimi task aperti
-- [ ] M5 SQL Server integration: database temporaneo autorizzato.
-- [ ] M6: completare viste legacy.
-- [ ] M7: porting documenti OpenXML.
-- [ ] M8: multi-arch e release.
-
-## Gate
-- Segreti working tree/history puliti.
-- Nessun push senza consenso; nessuna modifica distruttiva a DB persistente.
-- Non dichiarare SQL Server runtime testato senza log di istanza reale disposable.
+## Task
+- [x] Aggiungere result paging e API su store/repository.
+- [x] Implementare query paginata in EF (count + Skip/Take server-side) e store demo.
+- [x] Aggiornare controller e view con pager accessibile.
+- [x] Aggiungere test repository e web per gli scenari sopra.
+- [x] Test suite completa: Core 96, Data 15, Web 12 = 123 PASS.
+- [x] Build Release `/warnaserror`: 0 warning/error; Docker Compose up login 200/down OK.
+- [x] Aggiornare PLAN/docs, secret gates, commit locale; niente push.

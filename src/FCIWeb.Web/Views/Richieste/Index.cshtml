@@ -1,4 +1,4 @@
-@model IReadOnlyList<Richiesta>
+@model PagedResult<Richiesta>
 @{
     ViewData["Title"] = "Richieste";
 }
@@ -10,11 +10,12 @@
 
 <form method="get" asp-action="Index" class="filters">
     <input type="text" name="q" value="@ViewBag.Query" placeholder="Cerca per NDG, intestazione o UO" />
+    <input type="hidden" name="pageSize" value="@Model.PageSize" />
     <button type="submit">Cerca</button>
     <a class="linklike" asp-action="Index">Azzera</a>
 </form>
 
-@if (Model.Count == 0)
+@if (Model.Items.Count == 0)
 {
     <p class="empty">Nessuna richiesta trovata.</p>
 }
@@ -32,7 +33,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var r in Model)
+            @foreach (var r in Model.Items)
             {
                 <tr>
                     <td>@r.NDG</td>
@@ -45,4 +46,18 @@ else
             }
         </tbody>
     </table>
+
+    <nav class="pager" aria-label="Paginazione richieste">
+        <span>Pagina @Model.PageNumber di @Model.TotalPages — @Model.TotalCount risultati</span>
+        <div>
+            @if (Model.HasPreviousPage)
+            {
+                <a class="button" asp-action="Index" asp-route-q="@ViewBag.Query" asp-route-page="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize" rel="prev">Precedente</a>
+            }
+            @if (Model.HasNextPage)
+            {
+                <a class="button" asp-action="Index" asp-route-q="@ViewBag.Query" asp-route-page="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize" rel="next">Successiva</a>
+            }
+        </div>
+    </nav>
 }

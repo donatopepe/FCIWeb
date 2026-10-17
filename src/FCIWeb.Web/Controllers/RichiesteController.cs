@@ -18,10 +18,11 @@ namespace FCIWeb.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(string q)
+        public IActionResult Index(string q, int page = 1, int pageSize = 10)
         {
+            var result = _store.GetPage(q, page, pageSize);
             ViewBag.Query = q;
-            return View(_store.GetAll(q));
+            return View(result);
         }
 
         [HttpGet]

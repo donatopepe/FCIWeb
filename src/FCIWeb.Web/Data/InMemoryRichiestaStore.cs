@@ -54,6 +54,17 @@ namespace FCIWeb.Web.Data
             return all.ToList();
         }
 
+        public PagedResult<Richiesta> GetPage(string query, int pageNumber, int pageSize)
+        {
+            var safePageSize = Math.Clamp(pageSize, 1, 50);
+            var safePage = Math.Max(1, pageNumber);
+            var all = GetAll(query);
+            var totalPages = all.Count == 0 ? 0 : (int)Math.Ceiling(all.Count / (double)safePageSize);
+            if (totalPages > 0) safePage = Math.Min(safePage, totalPages);
+            var items = all.Skip((safePage - 1) * safePageSize).Take(safePageSize).ToList();
+            return new PagedResult<Richiesta>(items, safePage, safePageSize, all.Count);
+        }
+
         public Richiesta GetById(Guid id) => _items.TryGetValue(id, out var r) ? r : null;
 
         public Richiesta Add(Richiesta richiesta)

@@ -86,6 +86,9 @@ input[type="text"], input[type="password"], select, textarea {
 .form button { align-self: flex-start; margin-top: 10px; }
 .form-inline { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 16px; color: var(--muted); }
+.pager > div { display: flex; gap: 8px; }
+
 .grid { width: 100%; border-collapse: collapse; background: #fff; }
 .grid th, .grid td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); }
 .grid th { background: #eceef1; font-size: 13px; text-transform: uppercase; letter-spacing: .03em; }

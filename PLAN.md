@@ -31,14 +31,13 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 9 | `PLAN.md` | ✅ | questo file |
 | 10 | `docs/PROMPT-INGEGNERIZZATO.md` | ✅ | file |
 | 11 | CI verde: validazione statica | ✅ | run GitHub `38876403094` job "Validazione statica" → success |
-| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 119/119; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
+| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 123/123; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
 | 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 12**: **16/16 = 1.00** per i criteri della rubrica. La copertura funzionale
-rimane in evoluzione: migrations SQLite sono testate; SQL Server end-to-end non è ancora verificato.
+**Misurato al ciclo 13**: **16/16 = 1.00** per rubrica pubblicabilità; la copertura funzionale prosegue. Le migrations SQLite sono testate; SQL Server end-to-end non è ancora verificato.
 
 ## 3. Fatti verificati
 
@@ -91,7 +90,7 @@ rimane in evoluzione: migrations SQLite sono testate; SQL Server end-to-end non 
 | M3 | EF Core repository; SQLite demo + migrations; provider SQL Server compilato | `src/FCIWeb.Data/Migrations` | ✅* (SQLite testato; SQL Server runtime non verificato) |
 | M4 | Web app ASP.NET Core + `DEMO_MODE` avviabile | `src/FCIWeb.Web` + Dockerfile | ✅ |
 | M5 | Repository/servizi + adapter servizi esterni | `src/FCIWeb.Data`, `src/FCIWeb.Web/Data` | 🔶 (repository EF + adapter web; servizi esterni non portati) |
-| M6 | Viste Razor runtime + UI | `src/FCIWeb.Web/Views` | ⏳ |
+| M6 | Paging server-side elenco richieste + UI Razor accessibile (parziale) | `RichiesteController`, view Index | ✅* (altri moduli legacy aperti) |
 | M7 | Documenti: OpenXml al posto di Office Interop | `src/FCIWeb.Documents` | ⏳ |
 | M8 | Docker multi-arch + release | `Dockerfile`, tag | ⏳ |
 | F7 | Pulizia dead code / vendored / generated | `legacy/`, doc | ⏳ |
@@ -152,6 +151,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 10 | 2026-10-16 | M5 partial: token versione + compare-and-swap transizioni; stale-write tests repository/HTTP | ✅* | suite 118/118; build /warnaserror 0/0 |
 | 11 | 2026-10-16 | Test HTTP stale token con SQLite persistente e richiesta nuova | ✅* | suite 118/118; build /warnaserror 0/0; nessun push |
 | 12 | 2026-10-16 | Test generation migration script SQL Server idempotente senza connessione live | ✅* | test Data 12/12, suite 119/119; build /warnaserror 0/0 |
+| 13 | 2026-10-16 | M6 partial: paging SQL server-side richieste e navigazione Razor | ✅* | 3 test repository + 1 web; suite 123/123; Compose login 200 |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -312,6 +312,17 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Il test valida il design-time SQL generato; non simula né dichiara connessione o applicazione a DB reale.
 - Verifica Linux: Core 96 + Data 12 + Web 11 = **119/119**; build `/warnaserror` 0 warning/errori.
 - SQL Server live resta bloccato da assenza di istanza disposable autorizzata.
+
+### Dettaglio ciclo 13 (M6 partial — paging lista richieste)
+
+- Repository EF applica filtro, count, ordinamento deterministico, `Skip/Take` server-side.
+- Store in-memory applica stessa semantica; page size limitata 1–50, page clamped a range e empty state safe.
+- Controller riceve page/pageSize; Razor pager accessibile, query search preservata.
+- Test repository: pagine non sovrapposte, filtro prima di paging, invalid page/size, empty result;
+  test web verifica page 1/2 e ricerca che torna pagina singola.
+- Verifica Linux: Core 96 + Data 15 + Web 12 = **123/123**; build `/warnaserror` zero warning/errori.
+- Docker Compose smoke login 200, down OK. Nessun push.
+- Limite: M6 copre solo elenco Richieste, non viste legacy o allegati/documenti.
 
 ## 11. Stato pubblicazione
 

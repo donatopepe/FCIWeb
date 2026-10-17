@@ -76,7 +76,7 @@ FCIWeb.CrossPlatform.sln       (nuovo .NET 8 — target)
 | M3 | EF Core context + repository; migrations SQLite; SQL Server idempotent script generator | ✅* | SQLite tests + design-time SQL Server script test; live SQL Server non verificato |
 | M4 | Web app ASP.NET Core: hosting, routing, auth cookie, SQLite DEMO_MODE | ✅ (119 test, Docker Linux) |
 | M5 | Repository EF + transizioni optimistic concurrency; adapter servizi esterni | 🔶 (SQLite concurrency testata; SQL Server e servizi esterni aperti) |
-| M6 | Porting viste Razor a runtime + UI (sostituzione Telerik/Kendo) | ⏳ |
+| M6 | UI Razor: paging server-side elenco Richieste (parziale; altre viste legacy aperte) | ✅* | test repository/web; moduli non portati restano backlog |
 | M7 | Documenti: sostituzione Office Interop con OpenXml | ⏳ |
 | M8 | Pacchettizzazione Docker (`linux/amd64`, `linux/arm64`) + release | ⏳ |
 

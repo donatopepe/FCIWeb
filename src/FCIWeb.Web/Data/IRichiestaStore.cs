@@ -10,6 +10,8 @@ namespace FCIWeb.Web.Data
     {
         IReadOnlyList<Richiesta> GetAll(string query = null);
 
+        PagedResult<Richiesta> GetPage(string query, int pageNumber, int pageSize);
+
         Richiesta GetById(Guid id);
 
         Richiesta Add(Richiesta richiesta);
