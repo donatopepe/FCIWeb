@@ -8,7 +8,16 @@ pubblico.
 > Stato: analisi statica dei riferimenti in `Source/FCIWeb.csproj`, `Source/packages.config` e `lib/`.
 > Le versioni commerciali e le condizioni vanno confermate dall'owner prima di qualunque pubblicazione.
 
-## 1. Librerie non NuGet in `lib/` — ❌ bloccanti la pubblicazione
+## 1. NuGet usati dal porting .NET 8
+
+| Pacchetto | Versione | Licenza | Uso |
+|-----------|----------|---------|-----|
+| DocumentFormat.OpenXml | 3.3.0 | MIT (NuGet metadata) | Generazione XLSX cross-platform, senza Office/Interop |
+
+Verificare l'elenco aggiornato delle dipendenze transitive al restore tramite `dotnet list package --include-transitive`.
+DocumentFormat.OpenXml e il suo framework OpenXml sono MIT; l'inventario transitive corrente include i pacchetti già presenti via EF Core/design, da valutare secondo licenze individuali prima della release. Nessuna dipendenza commerciale è stata aggiunta dal porting XLSX.
+
+## 2. Librerie non NuGet in `lib/` — ❌ bloccanti la pubblicazione
 
 | Componente | File | Licenza / natura | Ridistribuibile | Azione |
 |-----------|------|------------------|-----------------|--------|

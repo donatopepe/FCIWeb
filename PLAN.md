@@ -31,13 +31,13 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 9 | `PLAN.md` | ✅ | questo file |
 | 10 | `docs/PROMPT-INGEGNERIZZATO.md` | ✅ | file |
 | 11 | CI verde: validazione statica | ✅ | run GitHub `38876403094` job "Validazione statica" → success |
-| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test locali 138/138; build /warnaserror 0/0; workflow GitHub non eseguito sul commit corrente |
+| 12 | CI verde: build + test cross-platform `.NET 8` | ✅ | test Linux 142/142; build `/warnaserror` da eseguire dopo XLSX; workflow GitHub non eseguito sul commit corrente |
 | 13 | Nessuna dipendenza proprietaria/commerciale tracciata | ✅ | `git ls-files` → nessun binario; history pulita |
 | 14 | Dead code / vendored documentati o archiviati | ✅ | `docs/ANALISI-CODICE.md`, `docs/PORTING-CROSS-PLATFORM.md` |
 | 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 16**: **16/16 = 1.00** per rubrica pubblicabilità; il porting funzionale prosegue, M7 limitato all'export CSV.
+**Misurato al ciclo 17**: **16/16 = 1.00** per rubrica pubblicabilità; il porting funzionale prosegue, M7 include CSV/XLSX ma resta parziale.
 
 ## 3. Fatti verificati
 
@@ -91,7 +91,7 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | M4 | Web app ASP.NET Core + `DEMO_MODE` avviabile | `src/FCIWeb.Web` + Dockerfile | ✅ |
 | M5 | Repository/servizi + adapter servizi esterni | `src/FCIWeb.Data`, `src/FCIWeb.Web/Data` | 🔶 (repository EF + adapter web; servizi esterni non portati) |
 | M6 | Paging server-side elenco richieste + UI Razor accessibile (parziale) | `RichiesteController`, view Index | ✅* (altri moduli legacy aperti) |
-| M7 | Export CSV sicuro richieste (partial); documenti Office restano backlog | `CsvExport`, `RichiesteController.ExportCsv` | ✅* (non copre Word/Excel/PDF) |
+| M7 | Export CSV + XLSX sicuri richieste (partial); Word/PDF restano backlog | `CsvExport`, `XlsxExport`, `RichiesteController` | ✅* (non copre Word/PDF) |
 | M8 | Docker multi-arch + release | `Dockerfile`, tag | ⏳ |
 | F7 | Pulizia dead code / vendored / generated | `legacy/`, doc | ⏳ |
 | F8 | Validazione finale e release | changelog, checklist | ⏳ |
@@ -155,6 +155,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 14 | 2026-10-16 | Cybersecurity login hardening: lockout, returnUrl, cookie Secure/HSTS tests | ✅* | 3 test hardening; full suite 126/126; build warn-as-error 0/0 |
 | 15 | 2026-10-16 | M7 partial: CSV export richieste, CSV escaping/formula injection, auth/filter tests | ✅* | full suite 138/138; build warnaserror 0/0; Compose anonymous export 302 |
 | 16 | 2026-10-16 | Verifica M7: test CSV quoting, BOM, formula prefixes e auth/download filter | ✅* | 138 test; build `/warnaserror` 0/0; Compose login 200 |
+| 17 | 2026-10-16 | M7 partial: export XLSX cross-platform Open XML, endpoint autenticato, filtro | ✅* | Docker test: Core 96 + Data 15 + Web 31 = 142/142; build `/warnaserror` 0/0 |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -371,6 +372,16 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Suite Linux: Core 96 + Data 15 + Web 27 = **138/138**; build `/warnaserror` zero warning/errori.
 - Compose build/up: login 200; export anonimo → 302 login; down completato.
 - Limite: M7 partial solo CSV; non sostituisce generazione documenti Word/Excel/PDF/OpenXML.
+
+### Dettaglio ciclo 17 (M7 partial — XLSX export)
+
+- Aggiunto `XlsxExport` con Open XML SDK 3.3.0; dati non trusted resi sempre inline strings, non formule.
+- Endpoint autenticato `GET /Richieste/ExportXlsx?q=...`, riusa il filtro e scarica `.xlsx`; link nella lista.
+- Test: workbook leggibile, intestazioni/righe, inline strings per payload formula, testo XML-like, dataset vuoto; HTTP authorization/filtro/MIME/filename.
+- Test Linux in container SDK 8.0: Core 96 + Data 15 + Web 31 = **142/142**.
+- Build Release `/warnaserror`: 0 warning/errori (eseguita dopo `dotnet restore` nel container).
+- Docker Compose build/up/down: login HTTP 200; export XLSX anonimo → 302 login.
+- Limite: M7 ancora parziale; Word e PDF non portati.
 
 ### Dettaglio ciclo 16 (revalidazione M7 export CSV)
 

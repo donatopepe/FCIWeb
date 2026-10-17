@@ -77,6 +77,10 @@ rate limiting distribuito/reverse-proxy e validazione configurazione.
 | Login lockout per account+IP | `LoginAbuseGuard` (per-process) | test integrazione con clock controllabile |
 | CSV formula injection | `CsvExport.NeutralizeSpreadsheetFormula` | test payload `= + - @` e prefissi whitespace/control |
 | CSV authentication/filter | `RichiesteController.ExportCsv` | test auth redirect, content type/attachment, query filtering |
+| XLSX formula safety | `XlsxExport` emits all values as inline strings (no formula cells) | tests parse workbook and verify untrusted values remain inline strings |
+| XLSX authentication/filter | `RichiesteController.ExportXlsx` | HTTP tests auth redirect, MIME/attachment, query filtering |
+| XLSX formula safety | `XlsxExport` emits all values as inline strings (no formula cells) | tests parse workbook and verify untrusted values remain inline strings |
+| XLSX authentication/filter | `RichiesteController.ExportXlsx` | HTTP tests auth redirect, MIME/attachment, query filtering |
 | ReturnUrl anti-open-redirect | `AccountController.Login` | test URL esterno |
 | Cookie Secure/HttpOnly/SameSite | `Program.cs` | test Set-Cookie |
 | Antiforgery su tutte le POST | `AutoValidateAntiforgeryTokenAttribute` | test integrazione (400 senza token) |

@@ -57,7 +57,7 @@ FCIWeb.CrossPlatform.sln       (nuovo .NET 8 — target)
 | `System.Web.Security` / Windows auth | Cookie auth per demo, `Negotiate` opzionale su Windows | |
 | Razor views + RazorGenerator | Razor a runtime (ASP.NET Core) | eliminare `*.generated.cs` |
 | Telerik MVC / Kendo MVC helpers | Kendo UI for jQuery lato client (o alternativa permissiva) | decisione in F7 |
-| `Microsoft.Office.Interop.Word` | `DocumentFormat.OpenXml` (già referenziato) o `OpenXml`/`QuestPDF` | |
+| `Microsoft.Office.Interop.Word` | `DocumentFormat.OpenXml` 3.3.0 (NuGet MIT) per XLSX; DOCX/PDF restano da portare | XLSX export requests cross-platform in `src/FCIWeb.Web/Data/XlsxExport.cs` |
 | `Microsoft.Web.Services3` (WSE) | `HttpClient` + `System.ServiceModel` / REST | |
 | `AreaCommonWeb.dll`, `WebServiceModel.dll` | interfacce + adapter (mock in `DEMO_MODE`) | rimuove le dipendenze proprietarie |
 | `System.Drawing` (TabelleDB) | `SkiaSharp`/`ImageSharp` oppure rimozione | solo se usato |
@@ -77,7 +77,7 @@ FCIWeb.CrossPlatform.sln       (nuovo .NET 8 — target)
 | M4 | Web app ASP.NET Core: hosting, routing, auth cookie, SQLite DEMO_MODE | ✅ (119 test, Docker Linux) |
 | M5 | Repository EF + transizioni optimistic concurrency; adapter servizi esterni | 🔶 (SQLite concurrency testata; SQL Server e servizi esterni aperti) |
 | M6 | UI Razor: paging server-side elenco Richieste (parziale; altre viste legacy aperte) | ✅* | test repository/web; moduli non portati restano backlog |
-| M7 | Export CSV sicuro per richieste (parziale); Office docs ancora backlog | ✅* | test CSV/formula injection/auth/filter; Word/Excel/PDF non portati |
+| M7 | Export CSV + XLSX sicuro per richieste (parziale); Word/PDF ancora backlog | ✅* | test CSV/XLSX/formula safety/auth/filter; Word/PDF non portati |
 | M8 | Pacchettizzazione Docker (`linux/amd64`, `linux/arm64`) + release | ⏳ |
 
 \* SQLite è backend predefinito, migra schema con `Database.Migrate()` e ha test migration/persistenza.

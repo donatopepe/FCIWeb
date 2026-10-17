@@ -49,6 +49,20 @@ namespace FCIWeb.Web.Controllers
         }
 
         [HttpGet]
+        public IActionResult ExportXlsx(string q)
+        {
+            var records = new List<FCIWeb.Core.Models.Richiesta>();
+            var firstPage = _store.GetPage(q, 1, 50);
+            records.AddRange(firstPage.Items);
+            for (var current = 2; current <= firstPage.TotalPages; current++)
+                records.AddRange(_store.GetPage(q, current, 50).Items);
+
+            var bytes = XlsxExport.Serialize(records);
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"fciweb-richieste-{DateTime.UtcNow:yyyyMMdd-HHmmss}.xlsx");
+        }
+
+        [HttpGet]
         public IActionResult Create() => View(new RichiestaCreateModel());
 
         [HttpPost]

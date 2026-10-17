@@ -1,10 +1,31 @@
-# TODO — M7 export CSV sicuro per richieste
+# TODO — M7 document export cross-platform
 
-## Obiettivo
-Aggiungere export CSV autorizzato per l'elenco richieste, riusando filtri, escaping CSV e mitigazione formula injection, con test unitari e HTTP.
+## Obiettivo del ciclo
+Aggiungere export XLSX cross-platform per richieste usando Open XML SDK (MIT), senza Office Interop, mantenendo export CSV esistente.
 
 ## Metrica + soglia
-**Metrica**: casi export passati / casi totali; soglia 100%, suite totale verde e build Release `/warnaserror` senza warning.
+**Metrica**: casi export XLSX superati / casi totali; soglia **100%**, suite completa verde e build Release `/warnaserror` senza warning/errori.
+
+## Casi ordinati (definiti prima dell'implementazione)
+1. XLSX non vuoto, apribile da OpenXmlReader, foglio `Richieste`, intestazioni e righe.
+2. Celle testuali con escape XML/UTF-8 corretto; NDG e note non interpretati come formule (inline strings).
+3. Zero record produce workbook valido con solo header.
+4. HTTP endpoint protetto da auth, query filtro rispettata e Content-Disposition `.xlsx`.
+5. Nessun dipendente da Office/COM/Windows.
+
+## Dipendenze
+- EF/in-memory stores, ASP.NET Core MVC, test xUnit già presenti.
+- NuGet `DocumentFormat.OpenXml` (licenza MIT; verificare transitive licenses / THIRD-PARTY-NOTICES).
+
+## Task
+- [ ] Aggiungere serializer XLSX con Open XML SDK in `src/FCIWeb.Web` o `src/FCIWeb.Data`.
+- [ ] Aggiungere endpoint auth `ExportXlsx`, filtro coerente e nome file.
+- [ ] Test XLSX struttura/escaping/empty e test HTTP auth/filter.
+- [x] Aggiornare third-party notices, README, guida, porting, PLAN §2/§6/§10.
+- [x] Full suite 142/142 e build `/warnaserror` 0/0 nel container; secret/history gates OK.
+- [x] Docker Compose build/up/down Linux; login HTTP 200, export XLSX anonimo 302 login.
+- [ ] Commit locale conventional, nessun push.
+
 
 ## Casi ordinati, definiti prima dell'implementazione
 1. CSV valido: header, UTF-8, righe/campi con virgole, quote e newline correttamente escaped.
