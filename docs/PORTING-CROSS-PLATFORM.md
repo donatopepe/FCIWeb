@@ -77,7 +77,7 @@ FCIWeb.CrossPlatform.sln       (nuovo .NET 8 — target)
 | M4 | Web app ASP.NET Core: hosting, routing, auth cookie, SQLite DEMO_MODE | ✅ (119 test, Docker Linux) |
 | M5 | Repository EF + transizioni optimistic concurrency; adapter servizi esterni | 🔶 (SQLite concurrency testata; SQL Server e servizi esterni aperti) |
 | M6 | UI Razor: paging server-side elenco Richieste (parziale; altre viste legacy aperte) | ✅* | test repository/web; moduli non portati restano backlog |
-| M7 | Documenti: sostituzione Office Interop con OpenXml | ⏳ |
+| M7 | Export CSV sicuro per richieste (parziale); Office docs ancora backlog | ✅* | test CSV/formula injection/auth/filter; Word/Excel/PDF non portati |
 | M8 | Pacchettizzazione Docker (`linux/amd64`, `linux/arm64`) + release | ⏳ |
 
 \* SQLite è backend predefinito, migra schema con `Database.Migrate()` e ha test migration/persistenza.

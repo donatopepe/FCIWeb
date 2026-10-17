@@ -5,7 +5,10 @@
 
 <div class="page-head">
     <h1>Richieste</h1>
-    <a class="button" asp-action="Create">Nuova richiesta</a>
+    <div>
+        <a class="button" asp-action="ExportCsv" asp-route-q="@ViewBag.Query">Esporta CSV</a>
+        <a class="button" asp-action="Create">Nuova richiesta</a>
+    </div>
 </div>
 
 <form method="get" asp-action="Index" class="filters">

@@ -75,6 +75,8 @@ rate limiting distribuito/reverse-proxy e validazione configurazione.
 | Validazione configurazione SMTP | `SecureSmtpValidator` | test unitari |
 | Header CSP/HSTS, anti-frame, nosniff, referrer | `SecurityHeadersExtensions` | test integrazione |
 | Login lockout per account+IP | `LoginAbuseGuard` (per-process) | test integrazione con clock controllabile |
+| CSV formula injection | `CsvExport.NeutralizeSpreadsheetFormula` | test payload `= + - @` e prefissi whitespace/control |
+| CSV authentication/filter | `RichiesteController.ExportCsv` | test auth redirect, content type/attachment, query filtering |
 | ReturnUrl anti-open-redirect | `AccountController.Login` | test URL esterno |
 | Cookie Secure/HttpOnly/SameSite | `Program.cs` | test Set-Cookie |
 | Antiforgery su tutte le POST | `AutoValidateAntiforgeryTokenAttribute` | test integrazione (400 senza token) |

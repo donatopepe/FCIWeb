@@ -34,7 +34,7 @@ docker run --rm -p 8080:8080 fciweb-web:local
 
 Cosa puoi fare: autenticarti, sfogliare le richieste con paginazione server-side (10 per pagina,
 search preservata), cercare, crearne una, cambiarne lo stato (transizioni validate), eliminarla
-(solo admin).
+(solo admin) ed esportare l'elenco filtrato in CSV con mitigazione formula injection.
 
 Sicurezza già attiva: header di sicurezza + CSP/HSTS, antiforgery su tutte le POST, password verificate
 con PBKDF2-SHA256, login lockout (per-process), returnUrl esterno respinto, cookie Secure/HttpOnly/SameSite,
@@ -44,7 +44,7 @@ rate-limit/lockout distribuito.
 Test:
 
 ```bash
-dotnet test FCIWeb.CrossPlatform.sln -c Release   # 126 test
+dotnet test FCIWeb.CrossPlatform.sln -c Release   # 138 test
 ```
 
 Stato: `src/FCIWeb.Core` (dominio + sicurezza), `src/FCIWeb.Data` (EF Core) e `src/FCIWeb.Web`

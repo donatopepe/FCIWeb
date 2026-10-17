@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using FCIWeb.Web.Data;
 using FCIWeb.Web.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -32,6 +33,19 @@ namespace FCIWeb.Web.Controllers
             if (richiesta == null) return NotFound();
             ViewBag.Transizioni = Richiesta.TransizioniAmmesse(richiesta.Stato);
             return View(richiesta);
+        }
+
+        [HttpGet]
+        public IActionResult ExportCsv(string q)
+        {
+            var records = new List<FCIWeb.Core.Models.Richiesta>();
+            var firstPage = _store.GetPage(q, 1, 50);
+            records.AddRange(firstPage.Items);
+            for (var current = 2; current <= firstPage.TotalPages; current++)
+                records.AddRange(_store.GetPage(q, current, 50).Items);
+
+            var bytes = CsvExport.Serialize(records);
+            return File(bytes, "text/csv; charset=utf-8", $"fciweb-richieste-{DateTime.UtcNow:yyyyMMdd-HHmmss}.csv");
         }
 
         [HttpGet]
