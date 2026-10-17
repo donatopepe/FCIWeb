@@ -37,7 +37,7 @@ Direzione confermata dall'owner: **porting a .NET 8** (non più solo .NET Framew
 | 15 | App cross-platform avviabile in `DEMO_MODE` (container Linux, no SQL/servizi/terze parti) | ✅ | compose build/up; login 200, DB SQLite creato su volume, container non-root |
 | 16 | `docs/PORTING-CROSS-PLATFORM.md` + piano di migrazione | ✅ | file |
 
-**Misurato al ciclo 15**: **16/16 = 1.00** per rubrica pubblicabilità; la copertura funzionale prosegue. Le migrations SQLite sono testate; SQL Server end-to-end non è ancora verificato.
+**Misurato al ciclo 16**: **16/16 = 1.00** per rubrica pubblicabilità; il porting funzionale prosegue, M7 limitato all'export CSV.
 
 ## 3. Fatti verificati
 
@@ -154,6 +154,7 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 | 13 | 2026-10-16 | M6 partial: paging SQL server-side richieste e navigazione Razor | ✅* | 3 test repository + 1 web; suite 123/123; Compose login 200 |
 | 14 | 2026-10-16 | Cybersecurity login hardening: lockout, returnUrl, cookie Secure/HSTS tests | ✅* | 3 test hardening; full suite 126/126; build warn-as-error 0/0 |
 | 15 | 2026-10-16 | M7 partial: CSV export richieste, CSV escaping/formula injection, auth/filter tests | ✅* | full suite 138/138; build warnaserror 0/0; Compose anonymous export 302 |
+| 16 | 2026-10-16 | Verifica M7: test CSV quoting, BOM, formula prefixes e auth/download filter | ✅* | 138 test; build `/warnaserror` 0/0; Compose login 200 |
 
 ### Dettaglio ciclo 2 (segreti e licenze)
 
@@ -370,6 +371,13 @@ Dettaglio del porting: [`docs/PORTING-CROSS-PLATFORM.md`](docs/PORTING-CROSS-PLA
 - Suite Linux: Core 96 + Data 15 + Web 27 = **138/138**; build `/warnaserror` zero warning/errori.
 - Compose build/up: login 200; export anonimo → 302 login; down completato.
 - Limite: M7 partial solo CSV; non sostituisce generazione documenti Word/Excel/PDF/OpenXML.
+
+### Dettaglio ciclo 16 (revalidazione M7 export CSV)
+
+- Ripetuta verifica export dopo commit M7: CSV serializer/test, endpoint auth e filtro, security gates.
+- Suite Linux completa: Core 96, Data 15, Web 27 = **138/138**; build `/warnaserror` 0/0.
+- Compose build/up: login 200; endpoint export anonimo → redirect a login.
+- Nessun code change necessario; nessun push.
 
 ## 11. Stato pubblicazione
 

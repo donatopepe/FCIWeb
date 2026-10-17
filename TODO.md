@@ -18,6 +18,7 @@ Aggiungere export CSV autorizzato per l'elenco richieste, riusando filtri, escap
 - [x] Aggiungere endpoint autenticato download e propagare query.
 - [x] Aggiungere test unitari escaping/formula injection e test MVC headers/auth/filter.
 - [x] Verificare full `dotnet test` (138), build `/warnaserror` (0/0).
+- [x] Revalidare dopo commit: 138 test e Docker Compose login HTTP 200, anonymous export 302 a login.
 - [x] Docker Compose build/up; login HTTP 200, anonymous export 302 a login.
 - [x] Aggiornare PLAN/docs/CodeGraph e secret gates.
 - [x] Commit locale Conventional Commit, nessun push.
