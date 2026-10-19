@@ -3,7 +3,7 @@
 ## Segnalazioni
 
 Per vulnerabilità di sicurezza **non** aprire una issue pubblica. Contatta l'owner del repository
-(`Donato Pepe <[PRIVATE_EMAIL]>`) con:
+(`Donato Pepe <contact@example.invalid>`) con:
 
 - descrizione della vulnerabilità e impatto;
 - passi di riproduzione;
